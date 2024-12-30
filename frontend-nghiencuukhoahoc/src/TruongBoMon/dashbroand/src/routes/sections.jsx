@@ -29,6 +29,11 @@ const IndexQuanLyCTDT = lazy(() =>
 const IndexQuanLydanhsachGV = lazy(() =>
   import("../sections/quanlydanhsach/CNTTdangky")
 );
+
+const ThongKe = lazy(() => import("../sections/Thongke/thongKe"));
+
+const Dev = lazy(() => import("../sections/dev/dev"));
+
 const IndexPage = lazy(() => import("../pages/app"));
 const BlogPage = lazy(() => import("../pages/blog"));
 const UserPage = lazy(() => import("../pages/user"));
@@ -51,7 +56,7 @@ export default function Router() {
               />
             }
           >
-            <IndexPage />
+            <ThongKe />
           </Suspense>
         </DashboardLayout>
       ),
@@ -242,6 +247,25 @@ export default function Router() {
             }
           >
             <AccountGV />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/Dev",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <Dev />
           </Suspense>
         </DashboardLayout>
       ),

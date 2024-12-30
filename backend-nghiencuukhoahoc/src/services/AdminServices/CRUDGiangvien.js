@@ -22,8 +22,6 @@ const selectGiangVien = async (page, limit) => {
   if (!limit || limit < 1) limit = 10;
 
   let offset = (page - 1) * limit;
-  console.log("-----------------------------------------------------------");
-  console.log("check page", page);
 
   // Truy vấn dữ liệu giảng viên với phân trang
   let [results0, fields] = await pool.execute(
@@ -67,8 +65,6 @@ const selectGiangVien = async (page, limit) => {
     itemsPerPage: limit, // Số bản ghi mỗi trang
   };
 
-  console.log(results0);
-
   return {
     EM: "Xem thông tin giảng viên thành công",
     EC: 1,
@@ -97,6 +93,7 @@ const selectOnlyGiangVienByTenDangNhap = async (TENDANGNHAP) => {
   CCD.THOIGIANNHAN,
   GV.DIENTHOAI,
   GV.DIACHI,
+  BM.MABOMON,
   BM.TENBOMON,
   TK.PHANQUYEN,
   TK.TRANGTHAITAIKHOAN,
@@ -131,7 +128,6 @@ WHERE
       results[0].THOIGIANNHAN = `${year}-${month}-${day}`;
     }
 
-    // console.log("selectOnlyGiangVienByTenDangNhap: ", results);
     return {
       EM: "Xem thông tin giảng viên thành công",
       EC: 1,
@@ -149,12 +145,10 @@ WHERE
 
 const selectOnlyGiangVien = async (MABOMON) => {
   try {
-    // console.log("check 2 =", MABOMON);
     let [results1, fields1] = await pool.execute(
       `select * from giangvien where MABOMON= ?`,
       [MABOMON]
     );
-    // console.log("check 3 =", results1);
     return {
       EM: " xem thông tin giảng viên của bộ môn đó thành công",
       EC: 1,
@@ -230,7 +224,6 @@ const updateTrangThaiTaiKhoanGiangVien = async (
 
     let results0 = await dataFronEnd(isOpenGetAllApiGV, MABOMON);
 
-    // console.log("results0.DT:  ", results0.DT)
     return {
       EM: "Cập nhật trạng thái tài khoản thành công",
       EC: 1,
@@ -275,11 +268,7 @@ const updateGiangVien = async (MAGV, dataGiangVien) => {
     // MAGV
     // dataGiangVien gồm MABOMON TENGV EMAIL DIENTHOAI DIACHI
 
-    //console.log("MAGV >>>>>", MAGV);
-    //console.log("dataGiangVien >>>>>", dataGiangVien);
-
     let KiemTra_MAGV = await timGiangVien_MAGV(MAGV);
-    //console.log("KiemTra_MAGV >>>>>", KiemTra_MAGV);
     if (!KiemTra_MAGV.length > 0) {
       return {
         EM: "Giảng viên này không tồn tại",
@@ -289,7 +278,6 @@ const updateGiangVien = async (MAGV, dataGiangVien) => {
     }
 
     let KiemTra_MABOMON = await selectBomon_MABOMON(dataGiangVien.MABOMON);
-    //console.log("KiemTra_MABOMON >>>>>", KiemTra_MABOMON);
     if (!KiemTra_MABOMON) {
       return {
         EM: "Bộ môn này không tồn tại",
@@ -329,7 +317,6 @@ const updateGiangVien = async (MAGV, dataGiangVien) => {
 
 const deleteGiangVien = async (MAGV, MABOMON, isOpenGetAllApiGV) => {
   try {
-    // console.log("check MGV1 +>", MAGV);
     if (!timGiangVien_MAGV(MAGV)) {
       return {
         EM: "Giảng viên này không tồn tại",
@@ -337,8 +324,6 @@ const deleteGiangVien = async (MAGV, MABOMON, isOpenGetAllApiGV) => {
         DT: [],
       };
     }
-    // console.log("check MGV2 +>", MAGV);
-
     // Kiểm tra và xóa trong bảng giu_chuc_vu
     const [results1] = await pool.execute(
       `SELECT * FROM giu_chuc_vu WHERE MAGV = ?`,
@@ -371,7 +356,6 @@ const deleteGiangVien = async (MAGV, MABOMON, isOpenGetAllApiGV) => {
 
     let results0 = await dataFronEnd(isOpenGetAllApiGV, MABOMON);
 
-    // console.log("results0.DT:  ", results0.DT)
     return {
       EM: "Xóa Giảng Viên Thành Công",
       EC: 1,
@@ -393,7 +377,6 @@ const updateGIANGVIEN = async (datagiangvien) => {
       "select * from taikhoan where TENDANGNHAP = ?",
       [tenDangnhap]
     );
-    // console.log(results1);
     if (results1.length > 0) {
       const isCorrectPass = await bcrypt.compare(
         matKhaucu,
@@ -445,7 +428,6 @@ const searchTenGiangVien = async (TENGIANGVIEN) => {
        
       `;
     const [rows] = await pool.execute(query, [`%${TENGIANGVIEN}%`]);
-    console.log("rows", rows);
     return {
       EM: "Xem giảng viên thành công",
       EC: 1,
@@ -463,7 +445,6 @@ const searchTenGiangVien = async (TENGIANGVIEN) => {
 const fakeChonKhungGV = async (data) => {
   try {
     let results = [];
-    console.log(data);
     // Lặp qua từng phần tử trong mảng data
     for (var i = 0; i < data.length; i++) {
       // Chuẩn bị các giá trị cần chèn cho từng bản ghi

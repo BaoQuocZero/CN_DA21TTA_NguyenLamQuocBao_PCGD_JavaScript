@@ -10,6 +10,10 @@ const AccountGV = lazy(() => import("../sections/Account/AccountGV"));
 const DangKyGioChuan = lazy(() =>
   import("../sections/DangKyGioChuan/IndexDangKyGioChuan")
 );
+const XemPhanCongGV = lazy(() => import("../sections/XemPhanCong/xemPhanCong"));
+const ThongKe = lazy(() => import("../sections/ThongKe/ThongKe"));
+const Dev = lazy(() => import("../sections/dev/dev"));
+
 const FileExcel = lazy(() => import("../sections/FileExcel/FileExcel"));
 
 const IndexPage = lazy(() => import("../pages/app"));
@@ -91,7 +95,7 @@ export default function Router() {
               />
             }
           >
-            {/* Component tương ứng */}
+            <XemPhanCongGV />
           </Suspense>
         </DashboardLayout>
       ),
@@ -130,6 +134,44 @@ export default function Router() {
             }
           >
             <IndexDangKyDanhmuc />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/thongke",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <ThongKe />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/dev",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <Dev />
           </Suspense>
         </DashboardLayout>
       ),

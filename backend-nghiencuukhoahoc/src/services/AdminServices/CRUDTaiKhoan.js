@@ -173,7 +173,7 @@ const createTaiKhoan = async (dataTaiKhoan) => {
   } catch (error) {
     return {
       EM: "lỗi services createTaiKhoan",
-      EC: 1,
+      EC: -1,
       DT: [],
     };
   }
@@ -223,7 +223,7 @@ const createOnlyTaiKhoan = async (dataTaiKhoanOnly) => {
     console.log(error);
     return {
       EM: "Lỗi services createTaiKhoan",
-      EC: 1,
+      EC: -1,
       DT: [],
     };
   }
@@ -366,7 +366,6 @@ const createTaiKhoanExcel = async (dataTaiKhoanExcelArray) => {
 
 const LoginTaikhoan = async (tenDangnhap, matKhau) => {
   try {
-    // console.log("tenDangnhap: ", tenDangnhap)
     const checkmail = isValidEmail(tenDangnhap);
     if (!checkmail) {
       return {
@@ -383,7 +382,6 @@ const LoginTaikhoan = async (tenDangnhap, matKhau) => {
 
     if (results.length > 0) {
       if (results[0].TRANGTHAITAIKHOAN === "Ngưng hoạt động") {
-        // console.log("results: ", results)
         return {
           EM: "Đăng nhập thất bại, tài khoản của bạn đã bị ngưng hoạt động",
           EC: 0,
