@@ -44,7 +44,7 @@ const LopMonHocTable = ({
   const handleRowClick = (index, row) => {
     setSelectedRow(row);
     setOpen(true);
-    console.log("check row", row);
+    // console.log("check row", row);
     setIndexSelect(index);
     fetchTableGVModal();
   };
@@ -61,8 +61,8 @@ const LopMonHocTable = ({
 
   useEffect(() => {
     const fetchDataAllGV = async () => {
-      console.log("searchEmail value:", searchEmail);
-      console.log("select_HocKiNienKhoa value:", select_HocKiNienKhoa);
+      // console.log("searchEmail value:", searchEmail);
+      // console.log("select_HocKiNienKhoa value:", select_HocKiNienKhoa);
 
       try {
         if (searchEmail && select_HocKiNienKhoa) {
@@ -133,6 +133,7 @@ const LopMonHocTable = ({
       console.error("Lỗi khi tìm kiếm giảng viên:", error);
     }
   };
+  console.log("data??? :", data)
   return (
     <>
       <TableContainer component={Paper}>
@@ -181,14 +182,14 @@ const LopMonHocTable = ({
                       row.SOTINCHITHUCHANH
                     )}
                   </TableCell>
-                  <TableCell align="center">{row.TENGV}</TableCell>
+                  <TableCell align="center">{row.giangVien ? row.giangVien.TENGV : row.TENGV}</TableCell>
                   <TableCell
                     align="center"
                     sx={{
                       color: row.TONG_SO_GIO < 500 ? "green" : "red",
                     }}
                   >
-                    {row.TONG_SO_GIO}
+                    {row.giangVien ? row.giangVien.TONG_SO_GIO : row.TONG_SO_GIO}
                   </TableCell>
                   <TableCell>
                     <EditIcon

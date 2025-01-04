@@ -187,7 +187,7 @@ const select_lophoc_monhoc = async (MALOP, SOHOCKI, MAHKNK, TEN_NAM_HOC) => {
           results_hockynienkhoa[index]
         );
 
-        let [results, fields] = await pool.execute(
+        let [results_MonHoc, fields_MonHoc] = await pool.execute(
           `
 SELECT 
 lop.*,
@@ -203,10 +203,74 @@ WHERE lop.MALOP = ? AND thuoc.SOTHUTUHOCKI = ?
           [MALOP, index + 1]
         );
 
+        let [results_GiangVien, fields_GiangVien] = await pool.execute(
+          `
+SELECT 
+    giangvien.*,
+    khunggiochuan.GIOGIANGDAY_HANHCHINH
+FROM giangvien
+LEFT JOIN chon_khung ON chon_khung.MAGV = giangvien.MAGV
+LEFT JOIN namhoc ON namhoc.MANAMHOC = chon_khung.MANAMHOC
+LEFT JOIN khunggiochuan ON chon_khung.MAKHUNG = khunggiochuan.MAKHUNG
+WHERE namhoc.TENNAMHOC = ?
+          `,
+          [TEN_NAM_HOC]
+        );
+
+        let [results_PhanCong, fields_PhanCong] = await pool.execute(
+          `
+SELECT 
+    giangvien.*,
+    lop.MALOP,
+    monhoc.MAMONHOC
+FROM giangvien
+LEFT JOIN bangphancong ON bangphancong.MAGV = giangvien.MAGV
+LEFT JOIN hockynienkhoa ON hockynienkhoa.MAHKNK = bangphancong.MAHKNK
+LEFT JOIN chitietphancong ON chitietphancong.MAPHANCONG = bangphancong.MAPHANCONG
+LEFT JOIN lop ON lop.MALOP = chitietphancong.MALOP
+LEFT JOIN monhoc ON monhoc.MAMONHOC = chitietphancong.MAMONHOC
+WHERE hockynienkhoa.TEN_NAM_HOC = ?
+          `,
+          [TEN_NAM_HOC]
+        );
+
+
+
+        console.log("results_MonHoc: ", results_MonHoc)
+        console.log("results_GiangVien: ", results_GiangVien)
+        console.log("results_PhanCong: ", results_PhanCong)
+        // Gộp dữ liệu từ results_MonHoc và results_PhanCong
+        const combinedMonHocPhanCong = results_MonHoc.map((monHoc) => {
+          const phanCong = results_PhanCong.find(
+            (pc) => pc.MALOP === monHoc.MALOP && pc.MAMONHOC === monHoc.MAMONHOC
+          );
+
+          return {
+            ...monHoc,
+            ...(phanCong || {}), // Thêm dữ liệu từ phanCong (nếu có)
+          };
+        });
+
+        // Gộp dữ liệu tiếp theo với results_GiangVien
+        const finalResult = combinedMonHocPhanCong.map((monHocPhanCong) => {
+          const giangVien = results_GiangVien.find(
+            (gv) => gv.MAGV === monHocPhanCong.MAGV
+          );
+
+          return {
+            ...monHocPhanCong,
+            ...(giangVien || {}), // Thêm dữ liệu từ giangVien (nếu có)
+          };
+        });
+
+        // Kết quả cuối cùng
+        console.log("Kết quả gộp dữ liệu: ", finalResult);
+
+
         return {
           EM: "Tìm thấy học kỳ niên khóa thỏa mãn điều kiện",
           EC: 1,
-          DT: results,
+          DT: finalResult,
         };
       } else {
         console.log("Không tìm thấy phần tử thỏa mãn điều kiện.");
@@ -301,75 +365,76 @@ function tinhSoTinChi(lythuyet, thuchanh) {
   const soHocKiNumber = Number(thuchanh);
 
   // Tính toán
-  return nNumber * 15 + soHocKiNumber * 30;
+  return nNumber * 15 + soHocKiNumber * 30 * 2;
 }
 
 const phancong_tudong_giangvien = async (data_phancong) => {
-  // try {
-  const currentTime = moment().format("YYYY-MM-DD");
-  for (var i = 0; i < data_phancong.data.length; i++) {
-    let tongSogio = tinhSoTinChi(
-      data_phancong.data[i].SOTINCHILYTHUYET,
-      data_phancong.data[i].SOTINCHITHUCHANH
-    );
+  try {
+    console.log("data_phancong: ", data_phancong)
+    const currentTime = moment().format("YYYY-MM-DD");
+    for (var i = 0; i < data_phancong.data.length; i++) {
+      let tongSogio = tinhSoTinChi(
+        data_phancong.data[i].SOTINCHILYTHUYET,
+        data_phancong.data[i].SOTINCHITHUCHANH
+      );
 
-    const [kiemtra_bangphancong, fields_kiemtrabangphancong] =
-      await pool.execute(
-        `select * from bangphancong where MAHKNK = ? and MAGV = ?`,
+      const [kiemtra_bangphancong, fields_kiemtrabangphancong] =
+        await pool.execute(
+          `select * from bangphancong where MAHKNK = ? and MAGV = ?`,
+          [data_phancong.HOCKINIENKHOA.MAHKNK, data_phancong.data[i].MAGV]
+        );
+
+      if (kiemtra_bangphancong.length === 0) {
+        await pool.execute(
+          `insert into bangphancong (MAHKNK,MAGV,THOIGIANLAP) values (?,?,?)`,
+          [
+            data_phancong.HOCKINIENKHOA.MAHKNK,
+            data_phancong.data[i].MAGV,
+            currentTime,
+          ]
+        );
+      }
+
+      const [select_bangphancong, fields_selectbangphancong] = await pool.execute(
+        `select MAPHANCONG from bangphancong where MAHKNK = ? and MAGV = ?`,
         [data_phancong.HOCKINIENKHOA.MAHKNK, data_phancong.data[i].MAGV]
       );
 
-    if (kiemtra_bangphancong.length === 0) {
-      await pool.execute(
-        `insert into bangphancong (MAHKNK,MAGV,THOIGIANLAP) values (?,?,?)`,
-        [
-          data_phancong.HOCKINIENKHOA.MAHKNK,
-          data_phancong.data[i].MAGV,
-          currentTime,
-        ]
-      );
+      const [select_chitietphancong, fields_selectchitietphancong] =
+        await pool.execute(
+          `select * from chitietphancong where MAMONHOC = ? and MAPHANCONG = ? and MALOP = ?`,
+          [
+            data_phancong.data[i].MAMONHOC,
+            select_bangphancong[0].MAPHANCONG,
+            data_phancong.data[i].MALOP,
+          ]
+        );
+
+      if (select_chitietphancong.length === 0) {
+        await pool.execute(
+          `insert into chitietphancong (MAMONHOC,MAPHANCONG,MALOP,TONG_SO_GIO) values (?,?,?,?)`,
+          [
+            data_phancong.data[i].MAMONHOC,
+            select_bangphancong[0].MAPHANCONG,
+            data_phancong.data[i].MALOP,
+            tongSogio,
+          ]
+        );
+      }
     }
 
-    const [select_bangphancong, fields_selectbangphancong] = await pool.execute(
-      `select MAPHANCONG from bangphancong where MAHKNK = ? and MAGV = ?`,
-      [data_phancong.HOCKINIENKHOA.MAHKNK, data_phancong.data[i].MAGV]
-    );
-
-    const [select_chitietphancong, fields_selectchitietphancong] =
-      await pool.execute(
-        `select * from chitietphancong where MAMONHOC = ? and MAPHANCONG = ? and MALOP = ?`,
-        [
-          data_phancong.data[i].MAMONHOC,
-          select_bangphancong[0].MAPHANCONG,
-          data_phancong.data[i].MALOP,
-        ]
-      );
-
-    if (select_chitietphancong.length === 0) {
-      await pool.execute(
-        `insert into chitietphancong (MAMONHOC,MAPHANCONG,MALOP,TONG_SO_GIO) values (?,?,?,?)`,
-        [
-          data_phancong.data[i].MAMONHOC,
-          select_bangphancong[0].MAPHANCONG,
-          data_phancong.data[i].MALOP,
-          tongSogio,
-        ]
-      );
-    }
+    return {
+      EM: "phân công cho giảng viên thành công",
+      EC: 1,
+      DT: [],
+    };
+  } catch (error) {
+    return {
+      EM: "Lỗi services create_listgiangvien_phancong",
+      EC: -1,
+      DT: [],
+    };
   }
-
-  return {
-    EM: "phân công cho giảng viên thành công",
-    EC: 1,
-    DT: [],
-  };
-  // } catch (error) {
-  //   return {
-  //     EM: "Lỗi services create_listgiangvien_phancong",
-  //     EC: -1,
-  //     DT: [],
-  //   };
-  // }
 };
 
 module.exports = {
