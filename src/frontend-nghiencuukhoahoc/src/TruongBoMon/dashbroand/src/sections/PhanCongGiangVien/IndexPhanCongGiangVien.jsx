@@ -47,7 +47,6 @@ const IndexPhanCongGiangVien = () => {
   const [SelectKhoaNamHoc, setSelectKhoaNamHoc] = useState("");
 
   const [isOpenButton, setIsOpenButton] = useState(false);
-  const [isOpenSwap, setIsOpenSwap] = useState(true);
   useEffect(() => {
     const auth = Cookies.get("accessToken");
     const decodeAuth = jwtDecode(auth);
@@ -64,10 +63,8 @@ const IndexPhanCongGiangVien = () => {
   }, [TenBoMon]);
 
   useEffect(() => {
-    // console.log("check useEffect");
     fetchDataMonHoc_byLop();
   }, [select_Lop, select_HocKiNienKhoa]);
-  // useEffect để tự động set lớp mới nhất khi khóa được chọn
   useEffect(() => {
     if (SelectKhoaNamHoc) {
       const lopTheoKhoa = filterLopByKhoa(SelectKhoaNamHoc);
@@ -86,9 +83,6 @@ const IndexPhanCongGiangVien = () => {
       const response = await CookiesAxios.get(
         `${process.env.REACT_APP_URL_SERVER}/api/v1/admin/giangvien/only/xemprofile/${taikhoan}`
       );
-
-      // console.log("Danh sách tài khoản:", response.data.DT);
-
       if (response.data.EC === 1) {
         setTenBoMon(response.data.DT.TENBOMON);
 
@@ -115,13 +109,6 @@ const IndexPhanCongGiangVien = () => {
             `${process.env.REACT_APP_URL_SERVER}/api/v1/admin/namhoc/xem`
           ),
         ]);
-
-      // console.log("Response from phancong/dachonkhung:", response.data);
-      // console.log(
-      //   "Response from hockinienkhoa/xem:",
-      //   response_hocKiNienKhoa.data
-      // );
-      // console.log("Response from namhoc/xem:", response_NamHoc.data);
       if (response_hocKiNienKhoa.data.EC == 1) {
         setData_hocKiNienKhoa(response_hocKiNienKhoa.data.DT);
         setSelect_HocKiNienKhoa(response_hocKiNienKhoa.data.DT[0]);
@@ -147,7 +134,6 @@ const IndexPhanCongGiangVien = () => {
       );
 
       if (response_Lop.data.EC === 1) {
-        console.log(response_Lop.data.DT);
         setData_Lop(response_Lop.data.DT);
         setSelect_Lop(response_Lop.data.DT[0].MALOP);
       }
@@ -161,24 +147,14 @@ const IndexPhanCongGiangVien = () => {
         `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/xem/phancong/lophoc/hocki`,
         { MALOP: select_Lop, HOCKINIENKHOA: select_HocKiNienKhoa }
       );
-      console.log("check fetchDataMonHoc_byLop", response_MonHoc.data);
       if (response_MonHoc.data.EC === 1) {
         setData_MonHoc(response_MonHoc.data.DT);
         setIsOpenButton(true);
       }
-      // console.log("data_MonHoc >>>>>>>: ", data_MonHoc);
-      // console.log("response_MonHoc.data.DT: ", response_MonHoc.data.DT);
     } catch (error) {
       console.error("Error fetching BoMon data:", error);
     }
   };
-
-  const handleChange = (event) => {
-    setIsOpenSwap(event.target.checked);
-  };
-  if (Loading) {
-    return "Đang tải dữ liệu...";
-  }
 
   // Hàm xử lý sự kiện để gửi data_MonHoc vào API
   const handleAutoAssign = async () => {
@@ -194,7 +170,6 @@ const IndexPhanCongGiangVien = () => {
       );
 
       if (response.data.EC === 1) {
-        console.log("Phân công tự động thành công:", response.data);
         setData_MonHoc(response.data.DT.data);
       } else {
         console.error("Phân công tự động thất bại:", response.data);
@@ -216,9 +191,7 @@ const IndexPhanCongGiangVien = () => {
       );
 
       if (response.data.EC === 1) {
-        console.log("Phân công tự động thành công:", response.data);
         toast.success("Phân công thành công");
-        // setData_MonHoc(response.data.DT.data);
       } else {
         console.error("Phân công tự động thất bại:", response.data.EM);
       }
@@ -384,27 +357,6 @@ const IndexPhanCongGiangVien = () => {
             </FormControl>
           </Box>
         </Grid>
-        {/* {isOpenXemPhanCong === "Thực Hiện Phân Công" ? (
-          <>
-            {" "}
-            <Grid item xs={12} md={2}>
-              <FormControlLabel
-                sx={{ mt: 2 }}
-                control={
-                  <Switch
-                    checked={isOpenSwap} // Kiểm soát Switch dựa vào isOpenSwap
-                    onChange={handleChange} // Gọi hàm khi Switch thay đổi
-                    inputProps={{ "aria-label": "controlled" }}
-                    color="secondary"
-                  />
-                }
-                label="Sử dụng gợi ý"
-              />
-            </Grid>
-          </>
-        ) : (
-          <></>
-        )} */}
       </Grid>
 
       {/* -----------TABLE SHOW GIANGVIEN----------- */}
@@ -423,31 +375,9 @@ const IndexPhanCongGiangVien = () => {
                 />
               </Box>
             </Grid>
-            {isOpenSwap ? (
-              <>
-                {" "}
-                <Grid item xs={12} md={3}>
-                  {" "}
-                  {/* <Box sx={{ mt: 3 }}>Gợi Ý</Box> */}
-                </Grid>{" "}
-              </>
-            ) : (
-              <>
-                {" "}
-                {/* <Grid item xs={12} md={3}>
-                  {" "}
-                  <Box sx={{ mt: 3 }}>
-                    <GVTableDaChonKhung
-                      data={data_ListGVDaChonKhung}
-                      selectNamHoc={selectNamHoc}
-                      select_HocKiNienKhoa={select_HocKiNienKhoa}
-                    />
-                  </Box>
-                </Grid>{" "} */}
-              </>
-            )}
           </Grid>
           {isOpenButton ? (
+            // Đây là phần có nút Tự động phân công và Xác nhận
             <>
               {" "}
               <Grid container spacing={2} mt={2}>
@@ -490,6 +420,7 @@ const IndexPhanCongGiangVien = () => {
         </>
       ) : (
         <>
+          {/* Cái này là Xem phân công giản viên */}
           <h1>
             <ListPhanCong select_HocKiNienKhoa={select_HocKiNienKhoa} />
           </h1>

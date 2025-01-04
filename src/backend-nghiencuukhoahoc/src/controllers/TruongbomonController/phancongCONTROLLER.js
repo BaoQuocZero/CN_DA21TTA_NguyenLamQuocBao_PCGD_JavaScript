@@ -114,7 +114,7 @@ const get_monhoc_lop_hocki = async (req, res) => {
       return res.status(400).json({
         EM: "Dữ liệu không hợp lệ",
         EC: 400,
-        DT: null,
+        DT: [],
       });
     }
     let results = await select_lophoc_monhoc(

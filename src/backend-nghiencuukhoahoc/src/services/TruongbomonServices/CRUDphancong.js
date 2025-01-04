@@ -290,29 +290,11 @@ function tinhSoThuTuHocKi(n, SOHOCKI) {
 
 const select_lophoc_monhoc = async (MALOP, SOHOCKI, MAHKNK, TEN_NAM_HOC) => {
   try {
-    console.log("MALOP: ", MALOP)
-    console.log("SOHOCKI: ", SOHOCKI)
-    console.log("MAHKNK: ", MAHKNK)
-    console.log("TEN_NAM_HOC: ", TEN_NAM_HOC)
-    // MALOP:  DA20TTA
-    // SOHOCKI:  Học Kì 2
-    // MAHKNK:  40
-    // TEN_NAM_HOC:  Năm Học 2024 - 2025
 
     let [results_lop, fields_lop] = await pool.execute(
       `SELECT * FROM lop WHERE lop.MALOP =  ?`,
       [MALOP]
     );
-    console.log("results_lop: ", results_lop)
-    // results_lop:  [
-    //   {
-    //     MALOP: 'DA20TTA',
-    //     MACHUONGTRINH: 1,
-    //     TENLOP: 'Đại học Công nghệ thông tin A 2020',
-    //     NAMTUYENSINH: 2020,
-    //     SISO: 30
-    //   }
-    // ]
 
     if (results_lop.length > 0) {
       // Lấy NAMTUYENSINH và chuyển thành ngày đầu tiên của năm
@@ -328,7 +310,6 @@ const select_lophoc_monhoc = async (MALOP, SOHOCKI, MAHKNK, TEN_NAM_HOC) => {
         [ngayBatDau]
       );
 
-      console.log("results_hockynienkhoa: ", results_hockynienkhoa);
       // Tìm phần tử trong results_hockynienkhoa
       const index = results_hockynienkhoa.findIndex(
         (item) =>
@@ -367,14 +348,14 @@ WHERE lop.MALOP = ? AND thuoc.SOTHUTUHOCKI = ?
         console.log("Không tìm thấy phần tử thỏa mãn điều kiện.");
         return {
           EM: "Không tìm thấy học kỳ niên khóa thỏa mãn điều kiện",
-          EC: 0,
-          DT: null,
+          EC: 1,
+          DT: [],
         };
       }
     } else {
       return {
         EM: "Không tìm thấy thông tin lớp học",
-        EC: -1,
+        EC: 1,
         DT: [],
       };
     }
