@@ -347,39 +347,72 @@ const xem_chitietphancong_banthan = async (MAGV, MAHKNK) => {
 
 const xem_giophancong_giangvienkhac = async (MAHKNK) => {
   try {
-    let [results_chitietphancong_data] = await pool.execute(
-      `SELECT giangvien.MAGV,giangvien.TENGV, khunggiochuan.GIOGIANGDAY_CHUAN,sum(chitietphancong.TONG_SO_GIO) as TONG_SO_GIO_DAY
-  FROM hockynienkhoa
-  LEFT JOIN bangphancong ON hockynienkhoa.MAHKNK = bangphancong.MAHKNK
-  LEFT JOIN chitietphancong ON bangphancong.MAPHANCONG = chitietphancong.MAPHANCONG
-  LEFT JOIN monhoc ON chitietphancong.MAMONHOC = monhoc.MAMONHOC
-  LEFT JOIN giangvien ON bangphancong.MAGV = giangvien.MAGV
-  LEFT JOIN chon_khung ON giangvien.MAGV = chon_khung.MAGV
-  LEFT JOIN khunggiochuan ON chon_khung.MAKHUNG = khunggiochuan.MAKHUNG
-  LEFT JOIN lop ON chitietphancong.MALOP = lop.MALOP
-  LEFT JOIN namhoc ON namhoc.MANAMHOC = chon_khung.MANAMHOC
-  WHERE hockynienkhoa.MAHKNK = ?
-  and chon_khung.MAGV is not null
-  group by giangvien.TENGV;
+
+    let [results_namhoc] = await pool.execute(
+      `
+SELECT * FROM hockynienkhoa WHERE MAHKNK = ?
   `,
       [MAHKNK]
     );
+    // console.log("results_namhoc: ", results_namhoc)
+    // console.log("results_namhoc.TEN_NAM_HOC: ", results_namhoc[0].TEN_NAM_HOC)
+    let [results_KhungChuan] = await pool.execute(
+      `
+SELECT 
+giangvien.MAGV,
+khunggiochuan.GIOGIANGDAY_HANHCHINH
+FROM giangvien
+LEFT JOIN chon_khung ON chon_khung.MAGV = giangvien.MAGV
+LEFT JOIN namhoc ON namhoc.MANAMHOC = chon_khung.MANAMHOC
+LEFT JOIN khunggiochuan ON khunggiochuan.MAKHUNG = chon_khung.MAKHUNG
+WHERE namhoc.TENNAMHOC = "Năm học 2020 - 2021" OR namhoc.TENNAMHOC IS NULL;
+  `, [results_namhoc[0].TEN_NAM_HOC]
+    );
 
-    let results = [];
-    for (let i = 0; i < results_chitietphancong_data.length; i++) {
-      results.push({
-        MAGV: results_chitietphancong_data[i].MAGV,
-        TENGV: results_chitietphancong_data[i].TENGV,
-        GIOGIANGDAY_CHUAN:
-          results_chitietphancong_data[i].GIOGIANGDAY_CHUAN + 300,
-        TONG_SO_GIO_DAY: results_chitietphancong_data[i].TONG_SO_GIO_DAY,
+    let [results_chitietphancong_data] = await pool.execute(
+      `
+SELECT 
+giangvien.MAGV, giangvien.TENGV, 
+SUM(chitietphancong.TONG_SO_GIO) as TONG_SO_GIO_DAY
+FROM giangvien
+LEFT JOIN bangphancong ON bangphancong.MAGV = giangvien.MAGV
+LEFT JOIN chitietphancong ON chitietphancong.MAPHANCONG  = bangphancong.MAPHANCONG
+GROUP BY giangvien.MAGV, giangvien.TENGV
+ORDER BY SUM(chitietphancong.TONG_SO_GIO) ASC
+  `
+    );
+
+    // console.log("results_KhungChuan: ", results_KhungChuan)
+    // console.log("results_chitietphancong_data: ", results_chitietphancong_data)
+    const mergeResults = (khungChuan, chiTietPhanCong) => {
+      const mergedResults = chiTietPhanCong.map(item => {
+        const khungItem = khungChuan.find(kh => kh.MAGV === item.MAGV);
+        return {
+          ...item,
+          GIOGIANGDAY_HANHCHINH: khungItem ? khungItem.GIOGIANGDAY_HANHCHINH : null,
+        };
       });
-    }
+
+      return mergedResults;
+    };
+    const mergedResults = mergeResults(results_KhungChuan, results_chitietphancong_data);
+    // console.log("mergedResults: ", mergedResults);
+
+    // let results = [];
+    // for (let i = 0; i < results_chitietphancong_data.length; i++) {
+    //   results.push({
+    //     MAGV: results_chitietphancong_data[i].MAGV,
+    //     TENGV: results_chitietphancong_data[i].TENGV,
+    //     GIOGIANGDAY_CHUAN:
+    //       results_chitietphancong_data[i].GIOGIANGDAY_CHUAN + 300,
+    //     TONG_SO_GIO_DAY: results_chitietphancong_data[i].TONG_SO_GIO_DAY,
+    //   });
+    // }
 
     return {
       EM: "xem thông tin phân công thành công",
       EC: 1,
-      DT: results,
+      DT: mergedResults,
     };
   } catch (error) {
     console.log("Lỗi services createchitietphancong_excel", error);

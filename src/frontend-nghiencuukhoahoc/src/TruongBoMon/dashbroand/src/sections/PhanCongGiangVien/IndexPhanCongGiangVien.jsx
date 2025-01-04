@@ -200,22 +200,6 @@ const IndexPhanCongGiangVien = () => {
       console.error("Lỗi khi phân công tự động:", error);
     }
   };
-  const handleUpdateGiangVien = (updatedTeacher, index) => {
-    // Cập nhật dữ liệu giảng viên trong data_MonHoc
-    setData_MonHoc((prevData) =>
-      prevData.map((item, i) => {
-        if (i === index) {
-          // Kiểm tra chỉ số của hàng
-          return {
-            ...item,
-            TENGV: updatedTeacher.TENGV,
-            MAGV: updatedTeacher.MAGV,
-          }; // Cập nhật thông tin giảng viên
-        }
-        return item; // Giữ nguyên các hàng khác
-      })
-    );
-  };
 
   const getKhoaFromMALOP = (malop) => {
     const khoa = malop.match(/\d{2}/); // Lấy 2 chữ số đầu tiên
@@ -371,7 +355,6 @@ const IndexPhanCongGiangVien = () => {
               <Box sx={{ mt: 3 }}>
                 <LopMonHocTable
                   data={data_MonHoc}
-                  handleUpdateGiangVien={handleUpdateGiangVien}
                   select_HocKiNienKhoa={select_HocKiNienKhoa}
                 />
               </Box>

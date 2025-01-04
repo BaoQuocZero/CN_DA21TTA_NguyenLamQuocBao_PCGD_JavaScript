@@ -182,10 +182,10 @@ const select_lophoc_monhoc = async (MALOP, SOHOCKI, MAHKNK, TEN_NAM_HOC) => {
       );
 
       if (index !== -1) {
-        console.log(
-          `Phần tử thỏa mãn điều kiện nằm ở vị trí: ${index}, dữ liệu: `,
-          results_hockynienkhoa[index]
-        );
+        // console.log(
+        //   `Phần tử thỏa mãn điều kiện nằm ở vị trí: ${index}, dữ liệu: `,
+        //   results_hockynienkhoa[index]
+        // );
 
         let [results_MonHoc, fields_MonHoc] = await pool.execute(
           `
@@ -234,11 +234,9 @@ WHERE hockynienkhoa.TEN_NAM_HOC = ?
           [TEN_NAM_HOC]
         );
 
-
-
-        console.log("results_MonHoc: ", results_MonHoc)
-        console.log("results_GiangVien: ", results_GiangVien)
-        console.log("results_PhanCong: ", results_PhanCong)
+        // console.log("results_MonHoc: ", results_MonHoc)
+        // console.log("results_GiangVien: ", results_GiangVien)
+        // console.log("results_PhanCong: ", results_PhanCong)
         // Gộp dữ liệu từ results_MonHoc và results_PhanCong
         const combinedMonHocPhanCong = results_MonHoc.map((monHoc) => {
           const phanCong = results_PhanCong.find(
@@ -264,7 +262,7 @@ WHERE hockynienkhoa.TEN_NAM_HOC = ?
         });
 
         // Kết quả cuối cùng
-        console.log("Kết quả gộp dữ liệu: ", finalResult);
+        // console.log("Kết quả gộp dữ liệu: ", finalResult);
 
 
         return {
@@ -370,7 +368,7 @@ function tinhSoTinChi(lythuyet, thuchanh) {
 
 const phancong_tudong_giangvien = async (data_phancong) => {
   try {
-    console.log("data_phancong: ", data_phancong)
+    // console.log("data_phancong: ", data_phancong)
     const currentTime = moment().format("YYYY-MM-DD");
     for (var i = 0; i < data_phancong.data.length; i++) {
       let tongSogio = tinhSoTinChi(

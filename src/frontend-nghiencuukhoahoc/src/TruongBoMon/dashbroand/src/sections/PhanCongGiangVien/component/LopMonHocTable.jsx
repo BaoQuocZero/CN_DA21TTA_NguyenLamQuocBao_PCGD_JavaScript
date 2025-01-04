@@ -25,15 +25,18 @@ import AddIcon from "@mui/icons-material/Add";
 import CookiesAxios from "../../CookiesAxios";
 const LopMonHocTable = ({
   data,
-  handleUpdateGiangVien,
   select_HocKiNienKhoa,
 }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [open, setOpen] = useState(false);
-  const [searchEmail, setSearchEmail] = useState(""); // State cho ô tìm kiếm email
   const [suggestedTeachers, setSuggestedTeachers] = useState([]); // State cho danh sách giảng viên được gợi ý
   const suggestionsRef = useRef(null);
   const [indexSelect, setIndexSelect] = useState(null);
+  const [listGVDiaLog, setListGVDiaLog] = useState([]);
+
+  const [searchEmail, setSearchEmail] = useState("");
+  const [filteredTeachers, setFilteredTeachers] = useState([]);
+
   const calculateTeachingHours = (siso, tinChiLyThuyet, tinChiThucHanh) => {
     const gioLyThuyet = tinChiLyThuyet * 15;
     const gioThucHanh =
@@ -44,7 +47,6 @@ const LopMonHocTable = ({
   const handleRowClick = (index, row) => {
     setSelectedRow(row);
     setOpen(true);
-    // console.log("check row", row);
     setIndexSelect(index);
     fetchTableGVModal();
   };
@@ -55,63 +57,16 @@ const LopMonHocTable = ({
     setSuggestedTeachers([]); // Reset danh sách gợi ý khi đóng modal
   };
 
-  const handleSearch = (e) => {
-    setSearchEmail(e.target.value);
-  };
-
   useEffect(() => {
-    const fetchDataAllGV = async () => {
-      // console.log("searchEmail value:", searchEmail);
-      // console.log("select_HocKiNienKhoa value:", select_HocKiNienKhoa);
+    fetchTableGVModal()
+  }, [open]);
 
-      try {
-        if (searchEmail && select_HocKiNienKhoa) {
-          // Safer check
-          // Gọi API khi có hơn 2 ký tự
-          const response = await CookiesAxios.post(
-            `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/timkiem/email`,
-            {
-              TENGIANGVIEN: searchEmail,
-              select_HocKiNienKhoa: select_HocKiNienKhoa,
-            }
-          );
-          console.log("Dữ liệu tìm kiếm:", response.data);
-          if (response.data.EC === 1) {
-            setSuggestedTeachers(response.data.DT);
-          }
-        } else {
-          setSuggestedTeachers([]); // Reset danh sách gợi ý nếu ký tự ít hơn 3
-        }
-      } catch (error) {
-        console.error("Lỗi khi tìm kiếm giảng viên:", error);
-      }
-    };
-    fetchDataAllGV();
-  }, [searchEmail]);
-
-  const handleSelectTeacher = (teacher, index) => {
-    const updatedTeacher = {
-      ...selectedRow,
-      TENGV: teacher.TENGV,
-      MAGV: teacher.MAGV,
-    };
-
-    setSelectedRow(updatedTeacher); // Cập nhật selectedRow
+  const handleSelectTeacher = (index, row) => {
+    console.log("selectedRow: ", selectedRow)
+    console.log("row: ", row)
     setSearchEmail(""); // Reset ô tìm kiếm sau khi chọn giảng viên
-    setSuggestedTeachers([]); // Xóa danh sách gợi ý sau khi chọn
-    console.log("teacher", teacher);
-    handleUpdateGiangVien(updatedTeacher, indexSelect); // `index` là chỉ số của hàng muốn cập nhật
   };
-  // Hàm xử lý khi hover vào một giảng viên
-  const handleHoverTeacher = (teacher) => {
-    const updatedTeacher = {
-      ...selectedRow,
-      TENGV: teacher.TENGV,
-      MAGV: teacher.MAGV,
-    };
 
-    setSelectedRow(updatedTeacher); // Cập nhật selectedRow khi hover
-  };
   const fetchTableGVModal = async () => {
     try {
       if (select_HocKiNienKhoa) {
@@ -123,9 +78,9 @@ const LopMonHocTable = ({
             MAHKNK: select_HocKiNienKhoa.MAHKNK,
           }
         );
-        console.log("Dữ liệu tìm kiếm:", response.data);
-        if (response.data.EC === 1) {
-        }
+        setListGVDiaLog(response.data.DT)
+        setFilteredTeachers(response.data.DT)
+
       } else {
         setSuggestedTeachers([]); // Reset danh sách gợi ý nếu ký tự ít hơn 3
       }
@@ -133,7 +88,24 @@ const LopMonHocTable = ({
       console.error("Lỗi khi tìm kiếm giảng viên:", error);
     }
   };
-  console.log("data??? :", data)
+
+  //Các hàm dùng trong DiaLog ================================================================================
+  // Hàm tìm kiếm
+  const handleSearch = (event) => {
+    const searchValue = event.target.value.toLowerCase();
+    setSearchEmail(searchValue);
+
+    // Lọc dữ liệu giảng viên dựa trên email hoặc tên giảng viên
+    const filteredData = listGVDiaLog.filter((teacher) => {
+      const teacherName = teacher.TENGV ? teacher.TENGV.toLowerCase() : '';
+      const teacherId = teacher.MAGV ? teacher.MAGV.toLowerCase() : '';
+
+      return teacherName.includes(searchValue) || teacherId.includes(searchValue);
+    });
+
+    setFilteredTeachers(filteredData);  // Cập nhật dữ liệu sau khi lọc
+  };
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -269,44 +241,13 @@ const LopMonHocTable = ({
                 marginRight: "20px",
               }}
             >
-              {/* Ô input và danh sách gợi ý */}
+              {/* Ô tìm kiếm */}
               <Form.Control
                 type="text"
-                placeholder="Tìm kiếm giảng viên theo email"
+                placeholder="Tìm kiếm giảng viên theo email hoặc mã giảng viên"
                 value={searchEmail}
                 onChange={handleSearch}
               />
-              {suggestedTeachers.length > 0 && (
-                <div
-                  ref={suggestionsRef}
-                  style={{
-                    position: "absolute",
-                    zIndex: 10,
-                    maxHeight: "400px",
-                    overflowY: "auto",
-                    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-                    width: "100%",
-                    backgroundColor: "white",
-                  }}
-                >
-                  {suggestedTeachers.map((teacher) => (
-                    <div
-                      key={teacher.id}
-                      onClick={() => handleSelectTeacher(teacher)}
-                      onMouseEnter={() => handleHoverTeacher(teacher)} // Thêm sự kiện onMouseEnter
-                      className="suggestion-item"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        padding: "8px 16px",
-                        cursor: "pointer", // Thêm con trỏ để thể hiện đây là phần tử có thể nhấp
-                      }}
-                    >
-                      {teacher.TENGV}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -314,18 +255,14 @@ const LopMonHocTable = ({
               <TableRow>
                 <TableCell>Mã Giảng Viên</TableCell>
                 <TableCell align="center">Tên Giảng Viên</TableCell>
-                <TableCell align="center">
-                  Tổng Số Giờ Đã Được Phân Công
-                </TableCell>
+                <TableCell align="center">Tổng Số Giờ Đã Được Phân Công</TableCell>
                 <TableCell align="center">Số Giờ Giảng Dạy Chuẩn</TableCell>
-                <TableCell align="center">Chuyên Môn Lĩnh Vực</TableCell>
-
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {Array.isArray(data) && data.length > 0 ? (
-                data.map((row, index) => (
+              {Array.isArray(filteredTeachers) && filteredTeachers.length > 0 ? (
+                filteredTeachers.map((row, index) => (
                   <TableRow
                     key={index}
                     sx={{
@@ -334,31 +271,14 @@ const LopMonHocTable = ({
                     }}
                     title={
                       row.TONG_SO_GIO
-                        ? `Giảng Viên Đang Có Số Giờ Là ${row.TONG_SO_GIO} giờ`
+                        ? `Giảng Viên Đang Có Số Giờ Là ${row.TONG_SO_GIO_DAY} giờ`
                         : `Giảng Viên Chưa Được Phân Công`
                     }
                   >
-                    <TableCell component="th" scope="row">
-                      {row.MALOP}
-                    </TableCell>
-                    <TableCell align="center">{row.TENMONHOC}</TableCell>
-                    <TableCell align="center">{row.SOTHUTUHOCKI}</TableCell>
-                    <TableCell align="center">
-                      {calculateTeachingHours(
-                        row.SISO,
-                        row.SOTINCHILYTHUYET,
-                        row.SOTINCHITHUCHANH
-                      )}
-                    </TableCell>
+                    <TableCell component="th" scope="row">{row.MAGV}</TableCell>
                     <TableCell align="center">{row.TENGV}</TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{
-                        color: row.TONG_SO_GIO < 500 ? "green" : "red",
-                      }}
-                    >
-                      {row.TONG_SO_GIO}
-                    </TableCell>
+                    <TableCell align="center">{row.TONG_SO_GIO_DAY ? row.TONG_SO_GIO_DAY : 0}</TableCell>
+                    <TableCell align="center">{row.GIOGIANGDAY_HANHCHINH ? row.GIOGIANGDAY_HANHCHINH : 0}</TableCell>
                     <TableCell>
                       <AddIcon
                         onClick={() => handleSelectTeacher(index, row)}
