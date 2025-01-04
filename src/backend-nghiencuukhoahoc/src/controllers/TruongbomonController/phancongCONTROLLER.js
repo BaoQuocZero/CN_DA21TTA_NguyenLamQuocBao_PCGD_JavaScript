@@ -8,6 +8,7 @@ const {
   xem_listgiangvien_phancong,
   selectLop_BoMon,
   phancong_tudong_giangvien,
+  update_phancong_giangvien,
 } = require("../../services/TruongbomonServices/CRUDphancong");
 const get_giangvien_CNTT_chuachonkhung = async (req, res) => {
   try {
@@ -211,6 +212,27 @@ const phancongtudong_giangvien_Controller = async (req, res) => {
   }
 };
 
+const update_phancong_giangvienController = async (req, res) => {
+  try {
+    const dataOld = req.body.selectedRow;
+    const dataNew = req.body.row;
+    let results = await update_phancong_giangvien(dataOld, dataNew);
+
+    return res.status(200).json({
+      EM: results.EM,
+      EC: results.EC,
+      DT: results.DT,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      EM: "lỗi create_onlylistgiangvien_phancong",
+      EC: -1,
+      DT: [],
+    });
+  }
+};
+
 module.exports = {
   get_giangvien_CNTT_chuachonkhung,
   get_giangvien_CNTT_dachonkhung,
@@ -221,4 +243,5 @@ module.exports = {
   create_onlylistgiangvien_phancong,
   getAllLop_BoMon_controller,
   phancongtudong_giangvien_Controller,
+  update_phancong_giangvienController
 };

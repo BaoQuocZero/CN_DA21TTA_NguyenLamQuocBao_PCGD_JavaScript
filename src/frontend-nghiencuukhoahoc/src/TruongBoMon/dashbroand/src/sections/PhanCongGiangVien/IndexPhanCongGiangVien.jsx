@@ -239,8 +239,9 @@ const IndexPhanCongGiangVien = () => {
                 defaultValue={isOpenXemPhanCong}
                 onChange={(e) => setIsOpenXemPhanCong(e.target.value)}
                 variant="outlined"
+                disabled
               >
-                <MenuItem value="Xem Phân Công">Xem Phân Công</MenuItem>{" "}
+                {/* <MenuItem value="Xem Phân Công">Xem Phân Công</MenuItem>{" "} */}
                 <MenuItem value="Thực Hiện Phân Công">
                   Thực Hiện Phân Công
                 </MenuItem>
@@ -355,6 +356,7 @@ const IndexPhanCongGiangVien = () => {
               <Box sx={{ mt: 3 }}>
                 <LopMonHocTable
                   data={data_MonHoc}
+                  fetchDataMonHoc_byLop={fetchDataMonHoc_byLop}
                   select_HocKiNienKhoa={select_HocKiNienKhoa}
                 />
               </Box>

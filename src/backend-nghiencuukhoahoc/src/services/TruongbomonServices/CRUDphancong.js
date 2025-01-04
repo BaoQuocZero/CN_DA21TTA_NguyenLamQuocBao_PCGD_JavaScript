@@ -220,9 +220,10 @@ WHERE namhoc.TENNAMHOC = ?
         let [results_PhanCong, fields_PhanCong] = await pool.execute(
           `
 SELECT 
-    giangvien.*,
+    giangvien.MAGV, giangvien.TENGV,
     lop.MALOP,
-    monhoc.MAMONHOC
+    monhoc.MAMONHOC,
+    SUM(chitietphancong.TONG_SO_GIO) AS TONG_SO_GIO
 FROM giangvien
 LEFT JOIN bangphancong ON bangphancong.MAGV = giangvien.MAGV
 LEFT JOIN hockynienkhoa ON hockynienkhoa.MAHKNK = bangphancong.MAHKNK
@@ -230,6 +231,7 @@ LEFT JOIN chitietphancong ON chitietphancong.MAPHANCONG = bangphancong.MAPHANCON
 LEFT JOIN lop ON lop.MALOP = chitietphancong.MALOP
 LEFT JOIN monhoc ON monhoc.MAMONHOC = chitietphancong.MAMONHOC
 WHERE hockynienkhoa.TEN_NAM_HOC = ?
+GROUP BY giangvien.MAGV, lop.MALOP, monhoc.MAMONHOC
           `,
           [TEN_NAM_HOC]
         );
@@ -435,6 +437,101 @@ const phancong_tudong_giangvien = async (data_phancong) => {
   }
 };
 
+const update_phancong_giangvien = async (dataOld, dataNew) => {
+  try {
+    // console.log("dataOld : ", dataOld);
+    // console.log("dataNew: ", dataNew);
+    const currentTime = moment().format("YYYY-MM-DD");
+
+    const [select_chitietphancong_dataOld] = await pool.execute(
+      `
+SELECT 
+  giangvien.*,
+  bangphancong.*,
+  hockynienkhoa.*,
+  chitietphancong.*
+FROM giangvien
+LEFT JOIN bangphancong ON bangphancong.MAGV = giangvien.MAGV
+LEFT JOIN chitietphancong ON chitietphancong.MAPHANCONG = bangphancong.MAPHANCONG
+LEFT JOIN hockynienkhoa ON hockynienkhoa.MAHKNK = bangphancong.MAHKNK
+WHERE giangvien.MAGV = ? AND chitietphancong.MALOP = ? AND chitietphancong.MAMONHOC = ?
+      `,
+      [dataOld.MAGV, dataOld.MALOP, dataOld.MAMONHOC]
+    );
+
+    if (select_chitietphancong_dataOld.length === 0 || select_chitietphancong_dataOld[0].MACHITIETPHANCONG === null) {
+      return {
+        EM: "Không tìm thấy giảng viên cũ",
+        EC: 0,
+        DT: [],
+      };
+    }
+
+    const [select_bangphancong_dataNew] = await pool.execute(
+      `
+SELECT 
+  giangvien.*,
+  bangphancong.*,
+  hockynienkhoa.*
+FROM giangvien
+LEFT JOIN bangphancong ON bangphancong.MAGV = giangvien.MAGV
+LEFT JOIN hockynienkhoa ON hockynienkhoa.MAHKNK = bangphancong.MAHKNK
+WHERE giangvien.MAGV = ? AND hockynienkhoa.MAHKNK = ?
+      `,
+      [dataNew.MAGV, select_chitietphancong_dataOld[0].MAHKNK]
+    );
+
+    if (select_bangphancong_dataNew.length === 0) {
+      const [tao_bangphancong_dataNew] = await pool.execute(
+        `
+INSERT INTO bangphancong(MAHKNK, MAGV, THOIGIANLAP) 
+VALUES (?, ?, ?)
+        `,
+        [select_chitietphancong_dataOld[0].MAHKNK, dataNew.MAGV, currentTime]
+      );
+
+      const insertId = tao_bangphancong_dataNew.insertId;
+
+      await pool.execute(
+        `
+UPDATE chitietphancong 
+SET MAPHANCONG = ?
+WHERE MACHITIETPHANCONG = ?
+        `,
+        [insertId, select_chitietphancong_dataOld[0].MACHITIETPHANCONG]
+      );
+
+      return {
+        EM: "Phân công cho giảng viên thành công",
+        EC: 1,
+        DT: [],
+      };
+    }
+
+    await pool.execute(
+      `
+UPDATE chitietphancong 
+SET MAPHANCONG = ?
+WHERE MACHITIETPHANCONG = ?
+      `,
+      [select_bangphancong_dataNew[0].MAPHANCONG, select_chitietphancong_dataOld[0].MACHITIETPHANCONG]
+    );
+
+    return {
+      EM: "Phân công cho giảng viên thành công",
+      EC: 1,
+      DT: [],
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      EM: "Lỗi xảy ra trong quá trình xử lý",
+      EC: -1,
+      DT: [],
+    };
+  }
+};
+
 module.exports = {
   select_giangvien_chuachonkhung,
   select_giangvien_dachonkhung,
@@ -446,4 +543,5 @@ module.exports = {
   xem_listgiangvien_phancong,
   selectLop_BoMon,
   phancong_tudong_giangvien,
+  update_phancong_giangvien,
 };

@@ -25,6 +25,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CookiesAxios from "../../CookiesAxios";
 const LopMonHocTable = ({
   data,
+  fetchDataMonHoc_byLop,
   select_HocKiNienKhoa,
 }) => {
   const [selectedRow, setSelectedRow] = useState(null);
@@ -61,9 +62,15 @@ const LopMonHocTable = ({
     fetchTableGVModal()
   }, [open]);
 
-  const handleSelectTeacher = (index, row) => {
-    console.log("selectedRow: ", selectedRow)
-    console.log("row: ", row)
+  const handleUpdateSelectTeacher = async (index, row) => {
+    const response = await CookiesAxios.post(
+      `${process.env.REACT_APP_URL_SERVER}/api/v1/truongbomon/giangvien/phancong/update/giangvien`,
+      {
+        selectedRow, row
+      }
+    );
+    fetchDataMonHoc_byLop();
+    handleClose();
     setSearchEmail(""); // Reset ô tìm kiếm sau khi chọn giảng viên
   };
 
@@ -80,7 +87,6 @@ const LopMonHocTable = ({
         );
         setListGVDiaLog(response.data.DT)
         setFilteredTeachers(response.data.DT)
-
       } else {
         setSuggestedTeachers([]); // Reset danh sách gợi ý nếu ký tự ít hơn 3
       }
@@ -113,11 +119,11 @@ const LopMonHocTable = ({
           <TableHead>
             <TableRow>
               <TableCell>Mã Lớp</TableCell>
-              <TableCell align="center">Tên Môn Học</TableCell>
-              <TableCell align="center">Số Thứ Tự Học Kỳ</TableCell>
-              <TableCell align="center">Số Giờ GD Của Môn</TableCell>
-              <TableCell align="center">Phân Công</TableCell>
-              <TableCell align="center">Số Giờ Đã Phân Công</TableCell>
+              <TableCell align="left">Tên Môn Học</TableCell>
+              <TableCell align="left">Số Thứ Tự Học Kỳ</TableCell>
+              <TableCell align="left">Số Giờ GD Của Môn</TableCell>
+              <TableCell align="left">Phân Công</TableCell>
+              <TableCell align="left">Số Giờ Đã Phân Công</TableCell>
               <TableCell align="center"></TableCell>
             </TableRow>
           </TableHead>
@@ -145,7 +151,7 @@ const LopMonHocTable = ({
                   <TableCell component="th" scope="row">
                     {row.MALOP}
                   </TableCell>
-                  <TableCell align="center">{row.TENMONHOC}</TableCell>
+                  <TableCell align="left">{row.TENMONHOC}</TableCell>
                   <TableCell align="center">{row.SOTHUTUHOCKI}</TableCell>
                   <TableCell align="center">
                     {calculateTeachingHours(
@@ -154,7 +160,7 @@ const LopMonHocTable = ({
                       row.SOTINCHITHUCHANH
                     )}
                   </TableCell>
-                  <TableCell align="center">{row.giangVien ? row.giangVien.TENGV : row.TENGV}</TableCell>
+                  <TableCell align="left">{row.giangVien ? row.giangVien.TENGV : row.TENGV}</TableCell>
                   <TableCell
                     align="center"
                     sx={{
@@ -276,12 +282,12 @@ const LopMonHocTable = ({
                     }
                   >
                     <TableCell component="th" scope="row">{row.MAGV}</TableCell>
-                    <TableCell align="center">{row.TENGV}</TableCell>
+                    <TableCell align="justify">{row.TENGV}</TableCell>
                     <TableCell align="center">{row.TONG_SO_GIO_DAY ? row.TONG_SO_GIO_DAY : 0}</TableCell>
                     <TableCell align="center">{row.GIOGIANGDAY_HANHCHINH ? row.GIOGIANGDAY_HANHCHINH : 0}</TableCell>
                     <TableCell>
                       <AddIcon
-                        onClick={() => handleSelectTeacher(index, row)}
+                        onClick={() => handleUpdateSelectTeacher(index, row)}
                         // onMouseEnter={() => handleHoverTeacher(teacher)}
                         sx={{
                           cursor: "pointer",

@@ -20,6 +20,7 @@ const {
   get_listgiangvien_phancong,
   create_onlylistgiangvien_phancong,
   phancongtudong_giangvien_Controller,
+  update_phancong_giangvienController,
 } = require("../../controllers/TruongbomonController/phancongCONTROLLER");
 
 const {
@@ -45,9 +46,6 @@ const CRUDgiangvien_CNTT = (app) => {
     checkUserJWT,
     get_giangvien_CNTT_chua_chon_khung
   );
-  //   router.post("/tao", createNAMHOC);
-  //   router.put("/sua/:MANAMHOC", updateNAMHOC);
-  //   router.delete("/xoa", deleteNAMHOC);
 
   //route bên phân công
   router.post(
@@ -61,23 +59,11 @@ const CRUDgiangvien_CNTT = (app) => {
     get_giangvien_CNTT_dachonkhung
   );
   router.post("/xem/phancong/lophoc/hocki", checkUserJWT, get_monhoc_lop_hocki);
-  router.post(
-    "/xem/phancong/dachonkhung/chitiet",
-    checkUserJWT,
-    get_giangvien_CNTT_dachonkhung_chitietonly
-  );
+  router.post("/xem/phancong/dachonkhung/chitiet", checkUserJWT, get_giangvien_CNTT_dachonkhung_chitietonly);
   router.post("/lop/bomon/xem", checkUserJWT, getAllLop_BoMon_controller);
   //bảng phân côngA
-  router.get(
-    "/xem/phancong/listgiangvien",
-    checkUserJWT,
-    get_listgiangvien_phancong
-  );
-  router.post(
-    "/tao/phancong/giangvien",
-    checkUserJWT,
-    create_onlylistgiangvien_phancong
-  );
+  router.get("/xem/phancong/listgiangvien", checkUserJWT, get_listgiangvien_phancong);
+  router.post("/tao/phancong/giangvien", checkUserJWT, create_onlylistgiangvien_phancong);
 
   //chi tiết phân công route
   router.post(
@@ -115,17 +101,10 @@ const CRUDgiangvien_CNTT = (app) => {
     Xem_Chitietphancong_banthan_Controller
   );
 
-  router.post(
-    "/phancong/tudong/giangvien",
-    checkUserJWT,
-    phancongtudong_giangvien_Controller
-  );
+  router.post("/phancong/tudong/giangvien", checkUserJWT, phancongtudong_giangvien_Controller);
+  router.post("/phancong/update/giangvien", checkUserJWT, update_phancong_giangvienController);
 
-  router.post(
-    "/xem/phancong/gio/giangvien",
-
-    select_giophancong_giangvienkhac_CONTROLLER
-  );
+  router.post("/xem/phancong/gio/giangvien", select_giophancong_giangvienkhac_CONTROLLER);
 
   router.post("/danhsachgiangviendangkynkhk", async (req, res) => {
     // try {
