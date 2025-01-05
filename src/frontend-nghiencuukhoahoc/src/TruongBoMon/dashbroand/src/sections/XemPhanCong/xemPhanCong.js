@@ -11,9 +11,7 @@ const XemPhanCongGV = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [giangVien, setGiangVien] = useState(null);
-    const [phanCong, setPhanCong] = useState([]);
-    const [filteredPhanCong, setFilteredPhanCong] = useState([]);
-    const [searchValue, setSearchValue] = useState("");
+    const [phanCong, setPhanCong] = useState({});
 
     const [selectedMonHoc, setSelectedMonHoc] = useState(null);
     const [openModal, setOpenModal] = useState(false);
@@ -60,34 +58,21 @@ const XemPhanCongGV = () => {
                 `${process.env.REACT_APP_URL_SERVER}/api/v1/quyengiangvien/thongke/getPhanCongGV_MAGV`,
                 { MAGV }
             );
-            if (response.data.EC === 1) {
+            if (response.data.EC === 1 && response.data.DT[0].MAPHANCONG) {
+                // Kiểm tra nếu MAPHANCONG khác null thì tiếp tục xử lý
                 setPhanCong(response.data.DT);
-                setFilteredPhanCong(response.data.DT); // Gán dữ liệu vào mảng lọc
                 setLoading(false);
             } else {
-                setError("Không tìm thấy dữ liệu phân công!");
+                // Trường hợp không hợp lệ hoặc không có dữ liệu
+                setError("Không tìm thấy dữ liệu phân công hoặc MAPHANCONG không hợp lệ!");
                 setLoading(false);
             }
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu phân công:", error);
             setError("Lỗi khi lấy dữ liệu phân công!");
             setLoading(false);
         }
-    };
-
-    // Xử lý tìm kiếm
-    const handleSearch = (e) => {
-        const value = e.target.value.toLowerCase();
-        setSearchValue(value);
-
-        const filtered = phanCong.filter((item) =>
-            Object.keys(item).some(
-                (key) =>
-                    typeof item[key] === "string" &&
-                    item[key].toLowerCase().includes(value)
-            )
-        );
-        setFilteredPhanCong(filtered);
     };
 
     const handleBaoCao = (monHoc) => {
@@ -97,6 +82,7 @@ const XemPhanCongGV = () => {
 
     const handleSave = async (fromKetThuc) => {
         try {
+            // console.log("fromKetThuc: ", fromKetThuc)
             const response = await CookiesAxios.post(
                 `${process.env.REACT_APP_URL_SERVER}/api/v1/quyengiangvien/thongke/createBaoCaoKetThuc`,
                 { fromKetThuc }
@@ -113,24 +99,21 @@ const XemPhanCongGV = () => {
         return <div>Loading...</div>;
     }
 
+    // if (error) {
+    //     return <div>Error: {error.message}</div>;
+    // }
+
     return (
         <>
             <div className="container my-4">
                 <h1 className="mb-4">Thông tin phân công</h1>
 
-                {/* Thanh tìm kiếm */}
-                <input
-                    type="text"
-                    className="form-control mb-3"
-                    placeholder="Tìm kiếm theo môn học, lớp, hoặc năm học..."
-                    value={searchValue}
-                    onChange={handleSearch}
-                />
-
-                {filteredPhanCong && filteredPhanCong.length > 0 ? (
+                {phanCong && phanCong.length > 0 ? (
                     <table className="table table-bordered table-striped">
                         <thead>
                             <tr>
+                                <th>#</th>
+
                                 <th>Ngày bắt đầu</th>
                                 <th>Tên học kỳ</th>
                                 <th>Năm học</th>
@@ -141,8 +124,9 @@ const XemPhanCongGV = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredPhanCong.map((item, index) => (
+                            {phanCong.map((item, index) => (
                                 <tr key={index}>
+                                    <td>{index + 1}</td>
                                     <td>{new Date(item.NGAYBATDAUNIENKHOA).toLocaleDateString()}</td>
                                     <td>{item.TENHKNK}</td>
                                     <td>{item.TEN_NAM_HOC}</td>

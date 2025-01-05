@@ -110,7 +110,7 @@ const RenderData = ({
         } else if (isOpenOption === "Chọn Khung Giờ") {
           setDataRenderKhungChuan(dataKhungChuan);
           setIsDisableNamHoc(true);
-          setSelectNamhoc(dataListNamHoc[0].TENNAMHOC);
+          // setSelectNamhoc(dataListNamHoc[0].TENNAMHOC);
           setisOpenButtonSelectKhung(true);
         }
       } catch (error) {
@@ -206,7 +206,7 @@ const RenderData = ({
             </Typography>
           </Col>{" "}
           <Col md={6} className="row-with-border1">
-            <Typography>
+            {/* <Typography>
               <>
                 <Col>
                   <Button
@@ -222,7 +222,7 @@ const RenderData = ({
             <p className="text-open-gate1">
               Lưu ý phải đăng ký khung giờ chuẩn nghiên cứu khoa học để có thể
               đăng ký danh mục khoa học công nghệ
-            </p>
+            </p> */}
           </Col>
         </Row>
         <Row>
@@ -261,8 +261,8 @@ const RenderData = ({
                   name="TENCHUCDANH"
                   label="Chức danh"
                   value={selectNamHoc}
-                  defaultValue={selectNamHoc}
-                  disabled={isDisableNamHoc}
+                  // defaultValue={selectNamHoc}
+                  // disabled={isDisableNamHoc}
                   onChange={(e) => setSelectNamhoc(e.target.value)}
                   variant="outlined"
                 >
@@ -348,9 +348,8 @@ const RenderData = ({
                 {dataRenderKhungChuan && dataRenderKhungChuan.length > 0 ? (
                   dataRenderKhungChuan.map((khungChuan, index) => (
                     <TableRow
-                      className={`table-row ${
-                        selectedRow === index ? "selected" : ""
-                      }`}
+                      className={`table-row ${selectedRow === index ? "selected" : ""
+                        }`}
                       key={index}
                       onClick={() => handleRowClick(index, khungChuan)}
                       sx={{

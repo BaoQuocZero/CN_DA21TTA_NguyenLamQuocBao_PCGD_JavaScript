@@ -28,7 +28,6 @@ const DangKyGioChuan = () => {
   useEffect(() => {
     const auth = Cookies.get("accessToken");
     const decodeAuth = jwtDecode(auth);
-    console.log("fetchDataGV run");
     fetchDataGV(decodeAuth.taikhoan);
   }, []);
 
@@ -50,10 +49,7 @@ const DangKyGioChuan = () => {
       const response_XemTimeKhungGioChuan = await CookiesAxios.get(
         `${process.env.REACT_APP_URL_SERVER}/api/v1/quyengiangvien/giangvien/xem/thoigianxacnhan`
       );
-      console.log(
-        "response_XemTimeKhungGioChuan.data.DT",
-        response_XemTimeKhungGioChuan.data.DT
-      );
+
       if (
         response_XemTimeKhungGioChuan.data.EC === 1 &&
         response_XemTimeKhungGioChuan.data.DT.length > 0
@@ -68,7 +64,6 @@ const DangKyGioChuan = () => {
         if (matchedKhoa) {
           const startTime = matchedKhoa.THOIGIANBATDAU;
           const endTime = matchedKhoa.THOIGIANKETTHUC;
-          // console.log("matchedKhoa", matchedKhoa);
           // Định dạng startTime và endTime chỉ lấy ngày
           const formattedStartDate = formatDate(startTime);
           const formattedEndDate = formatDate(endTime);
@@ -77,9 +72,6 @@ const DangKyGioChuan = () => {
           setEndTime(moment(endTime).format("DD-MM-YYYY"));
           // Lấy thời gian hiện tại và định dạng chỉ có ngày
           const currentDate = formatDate(moment().format()); // Định dạng ngày hiện tại
-
-          // console.log("Start Date:", formattedStartDate);
-          // console.log("End Date:", formattedEndDate);
 
           // So sánh currentDate với startMoment và endMoment
           if (
@@ -90,7 +82,6 @@ const DangKyGioChuan = () => {
               "[)"
             )
           ) {
-            console.log("check true ");
             setOpenChucNangtheokhungthoigian({
               XemKhungGio: "Xem Khung Giờ",
               ChonKhungGio: "Chọn Khung Giờ",
@@ -116,7 +107,6 @@ const DangKyGioChuan = () => {
         setGiangVien(response.data.DT);
         setChucDanhGiangVien(response.data.DT.TENCHUCDANH);
         setMaGV(response.data.DT.MAGV);
-        console.log("check chuc danh =>", response.data.DT.TENCHUCDANH);
         if (response.data.DT.TENCHUCDANH) {
           setIsGVChucDanh(true);
         } else {

@@ -58,14 +58,16 @@ const XemPhanCongGV = () => {
                 `${process.env.REACT_APP_URL_SERVER}/api/v1/quyengiangvien/thongke/getPhanCongGV_MAGV`,
                 { MAGV }
             );
-            if (response.data.EC === 1) {
-                console.log("response.data.DT: ", response.data.DT)
+            if (response.data.EC === 1 && response.data.DT[0].MAPHANCONG) {
+                // Kiểm tra nếu MAPHANCONG khác null thì tiếp tục xử lý
                 setPhanCong(response.data.DT);
                 setLoading(false);
             } else {
-                setError("Không tìm thấy dữ liệu phân công!");
+                // Trường hợp không hợp lệ hoặc không có dữ liệu
+                setError("Không tìm thấy dữ liệu phân công hoặc MAPHANCONG không hợp lệ!");
                 setLoading(false);
             }
+
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu phân công:", error);
             setError("Lỗi khi lấy dữ liệu phân công!");
