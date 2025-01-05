@@ -20,16 +20,27 @@ const CRUDBoMon = require("./routes/AdminRoute/BoMonRouter");
 const CRUDGiangVien = require("./routes/AdminRoute/GiangVienRouter");
 const CRUDMonHoc = require("./routes/AdminRoute/MonHocRouter");
 const CRUDNamHoc = require("./routes/AdminRoute/NamHocRouter");
+const CURDanhMuc = require("./routes/AdminRoute/DanhMucRoute");
+const CRUDHockinienkhoa = require("./routes/AdminRoute/hockinienkhoaRoute");
+const CRUDHinhthucdanhgia = require("./routes/AdminRoute/hinhthucdanhgiaRoute");
+
+const TruongKhoaRoute = require("./routes/TruongkhoaRoute/TruongKhoaRoute");
+const TruongKhoaThongKeRoute = require("./routes/TruongkhoaRoute/ThongKeRouter");
+
 const CRUDgiangvien_CNTT = require("./routes/TruongbomonRoute/giangvienRoute");
 const CRUDchuongtrinh_CNTT = require("./routes/TruongbomonRoute/chuongtrinhRoute");
-const QuyenGiangVienRouter = require("./routes/GiangvienRoute/QuyenGiangVienRouter");
-const CURDanhMuc = require("./routes/AdminRoute/DanhMucRoute");
-const TruongKhoaRoute = require("./routes/TruongkhoaRoute/TruongKhoaRoute");
 const TruongBoMonThongKe = require("./routes/TruongbomonRoute/ThongKeRouter");
-const CRUDHockinienkhoa = require("./routes/AdminRoute/hockinienkhoaRoute");
+
+
 const DangKyDanhMucRoute = require("./routes/GiangvienRoute/DangKyDanhMucSpKHCNRoute");
-const CRUDHinhthucdanhgia = require("./routes/AdminRoute/hinhthucdanhgiaRoute");
 const GiangVienThongke = require("./routes/GiangvienRoute/ThongKeRouter");
+const QuyenGiangVienRouter = require("./routes/GiangvienRoute/QuyenGiangVienRouter");
+
+
+
+
+
+
 
 const { Sevicel_CheckStatus_Python } = require("./python_status");
 //=================================================================================
@@ -70,6 +81,8 @@ CRUDHockinienkhoa(app); // route CRUD
 DangKyDanhMucRoute(app); // route chức năng cho quy đổi giờ chuẩn
 CRUDHinhthucdanhgia(app); //route hình thức đánh giá
 GiangVienThongke(app);
+
+TruongKhoaThongKeRoute(app)
 //=====================================================================================================
 
 app.listen(port, () => {

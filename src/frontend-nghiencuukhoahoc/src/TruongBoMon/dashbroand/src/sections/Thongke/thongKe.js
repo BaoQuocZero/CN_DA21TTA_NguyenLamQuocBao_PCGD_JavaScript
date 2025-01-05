@@ -13,7 +13,6 @@ import {
   PolarArea,
 } from "react-chartjs-2";
 import "chart.js/auto"; // Đăng ký tự động
-import { DataGrid } from "@mui/x-data-grid"; // Import Data Grid từ MUI
 
 import ModalChiTietGV from "./modal/ModalChiTietGV";
 import {
