@@ -40,11 +40,11 @@ const GiangVienList = ({
   const filteredGiangVien = dataListGiangVien
     ? dataListGiangVien
 
-        .filter((giangvien) => {
-          if (searchStatus === "All") return true;
-          return giangvien.TRANGTHAITAIKHOAN === searchStatus;
-        })
-        .slice((currentPage - 1) * pageSize, currentPage * pageSize) // Đã chỉnh từ 0 sang 1
+      .filter((giangvien) => {
+        if (searchStatus === "All") return true;
+        return giangvien.TRANGTHAITAIKHOAN === searchStatus;
+      })
+      .slice((currentPage - 1) * pageSize, currentPage * pageSize) // Đã chỉnh từ 0 sang 1
     : [];
 
   // Điều hướng trang
@@ -66,9 +66,8 @@ const GiangVienList = ({
         <button
           key={i}
           type="button"
-          className={`btn ${
-            currentPage === i ? "btn-primary" : "btn-outline-primary"
-          } mx-1`}
+          className={`btn ${currentPage === i ? "btn-primary" : "btn-outline-primary"
+            } mx-1`}
           onClick={() => goToPage(i)}
         >
           {i}
@@ -78,7 +77,6 @@ const GiangVienList = ({
     return buttons;
   };
 
-  console.log("check dataa gv = >", filteredGiangVien);
   return (
     <>
       <TableContainer component={Paper}>
@@ -107,9 +105,8 @@ const GiangVienList = ({
                 <TableRow
                   onClick={() => handleChoseRowGV(giangvien)}
                   key={index}
-                  className={`custom-table-row ${
-                    activeRowGV === giangvien.MABOMON ? "activeBM" : ""
-                  }`}
+                  className={`custom-table-row ${activeRowGV === giangvien.MABOMON ? "activeBM" : ""
+                    }`}
                 >
                   <TableCell>
                     {currentPage * pageSize + index + 1 - 10}
@@ -127,12 +124,12 @@ const GiangVienList = ({
                       giangvien.PHANQUYEN === "Admin"
                         ? "inactive-status"
                         : giangvien.PHANQUYEN === "Giảng Viên"
-                        ? "text-dark"
-                        : giangvien.PHANQUYEN === "Trưởng Bộ Môn"
-                        ? "text-primary"
-                        : giangvien.PHANQUYEN === "Trưởng Khoa"
-                        ? "text-primary"
-                        : ""
+                          ? "text-dark"
+                          : giangvien.PHANQUYEN === "Trưởng Bộ Môn"
+                            ? "text-primary"
+                            : giangvien.PHANQUYEN === "Trưởng Khoa"
+                              ? "text-primary"
+                              : ""
                     }
                   >
                     {giangvien.PHANQUYEN}
@@ -142,8 +139,8 @@ const GiangVienList = ({
                       giangvien.TRANGTHAITAIKHOAN === "Ngưng hoạt động"
                         ? "inactive-status"
                         : giangvien.TRANGTHAITAIKHOAN === "Đang hoạt động"
-                        ? "active-status"
-                        : ""
+                          ? "active-status"
+                          : ""
                     }
                   >
                     {giangvien.TRANGTHAITAIKHOAN}

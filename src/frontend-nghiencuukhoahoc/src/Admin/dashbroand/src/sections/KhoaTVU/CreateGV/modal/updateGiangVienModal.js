@@ -37,7 +37,6 @@ const UpdateGiangVienModal = ({
   const [TimeChucVu, setTimeChucVu] = useState();
   const [SoQuyetDinh, setSoQuyetDinh] = useState();
   useEffect(() => {
-    console.log("Check lecturerData =>", lecturerData);
     if (lecturerData) {
       setTenGV(lecturerData.TENGV);
       setTenDangNhapGV(lecturerData.TENDANGNHAP);
@@ -213,10 +212,9 @@ const UpdateGiangVienModal = ({
     }
   };
 
-  // console.log("checkChucDanhGiangVien => ", ChucDanhGiangVien);
+  console.log("dataListChucVuGiangVien: ", dataListChucVuGiangVien)
+  console.log("dataListChucDanhGiangVien: ", dataListChucDanhGiangVien)
 
-  // console.log("chucVuGiangVien => ", chucVuGiangVien);
-  // console.log("tenGV => ", tenGV);
   return (
     <Modal
       open={show}
@@ -271,16 +269,16 @@ const UpdateGiangVienModal = ({
               displayEmpty
               labelId="chuc-vu-label"
               value={chucVuGiangVien}
-              defaultValue={lecturerData.TENCHUCVU}
+              defaultValue={lecturerData.TENCHUCVU ? lecturerData.TENCHUCVU : ""}
               onChange={(e) => setchucVuGiangVien(e.target.value)}
               variant="outlined"
               className="height-selectGV"
               label={chucVuGiangVien}
             >
-              {dataListChucVuGiangVien && dataListChucVuGiangVien.length > 0 ? (
+              {Array.isArray(dataListChucVuGiangVien) && dataListChucVuGiangVien.length > 0 ? (
                 dataListChucVuGiangVien.map((chucvu, index) => (
-                  <MenuItem key={index} value={chucvu.TENCHUCVU}>
-                    {chucvu.TENCHUCVU}
+                  <MenuItem key={index} value={chucvu?.TENCHUCVU || ""}>
+                    {chucvu?.TENCHUCVU || "N/A"}
                   </MenuItem>
                 ))
               ) : (
@@ -333,15 +331,14 @@ const UpdateGiangVienModal = ({
               value={ChucDanhGiangVien}
               onChange={(e) => setChucDanhGiangVien(e.target.value)}
               variant="outlined"
-              defaultValue={lecturerData.TENCHUCDANH}
+              defaultValue={lecturerData.TENCHUCDANH ? lecturerData.TENCHUCDANH : ""}
               className="height-selectGV"
               label="Tên Chức Danh"
             >
-              {dataListChucDanhGiangVien &&
-                dataListChucDanhGiangVien.length > 0 ? (
+              {Array.isArray(dataListChucDanhGiangVien) && dataListChucDanhGiangVien.length > 0 ? (
                 dataListChucDanhGiangVien.map((chucdanh, index) => (
-                  <MenuItem key={index} value={chucdanh.TENCHUCDANH}>
-                    {chucdanh.TENCHUCDANH}
+                  <MenuItem key={index} value={chucdanh?.TENCHUCDANH || ""}>
+                    {chucdanh?.TENCHUCDANH || "N/A"}
                   </MenuItem>
                 ))
               ) : (

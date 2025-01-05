@@ -250,7 +250,7 @@ const LopMonHocTable = ({
               {/* Ô tìm kiếm */}
               <Form.Control
                 type="text"
-                placeholder="Tìm kiếm giảng viên theo email hoặc mã giảng viên"
+                placeholder="Tìm kiếm giảng viên theo tên"
                 value={searchEmail}
                 onChange={handleSearch}
               />

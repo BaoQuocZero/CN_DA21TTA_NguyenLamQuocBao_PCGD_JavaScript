@@ -13,6 +13,7 @@ import {
   PolarArea,
 } from "react-chartjs-2";
 import "chart.js/auto"; // Đăng ký tự động
+import { DataGrid } from "@mui/x-data-grid"; // Import Data Grid từ MUI
 
 import ModalChiTietGV from "./modal/ModalChiTietGV";
 import {
@@ -162,16 +163,14 @@ const ThongKe = () => {
     <div className="row">
       <div className="col-md-6">
         <h4>Số giờ phân công.</h4>
-        <Doughnut data={doughnut_GV_gioGiang} />
+        <PolarArea data={doughnut_GV_gioGiang} />
       </div>
       <div className="col-md-6">
         <h4>Phân công giảng viên</h4>
         <Pie data={pieData_GV_gioGiang_PhanCong} />
       </div>
       <div className="col-md-12 mt-3">
-        <div class="alert alert-warning" role="alert">
-          Về phần sấp xếp bảng đang chuyển sang dùng DataGrid
-        </div>
+
         <div className="container mt-4">
           <h2 className="text-center mb-4">Danh Sách Giảng Viên</h2>
           <table className="table table-hover table-bordered table-striped shadow-sm">
@@ -211,9 +210,6 @@ const ThongKe = () => {
           </table>
 
           {/* Pagination Controls */}
-          <div class="alert alert-danger" role="alert">
-            Lỗi phân trang đang sửa
-          </div>
           <div className="pagination-controls">
             <button
               className="btn btn-secondary"

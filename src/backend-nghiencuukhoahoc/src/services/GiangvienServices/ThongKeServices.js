@@ -161,6 +161,7 @@ LEFT JOIN lop l ON l.MALOP = ctpc.MALOP
 LEFT JOIN bao_cao_ket_thuc_mon bcktm ON bcktm.MACHITIETPHANCONG = ctpc.MACHITIETPHANCONG
 LEFT JOIN hinhthucdanhgia htdg ON htdg.MADANHGIAKETTHUC = bcktm.MADANHGIAKETTHUC
 WHERE gv.MAGV = ?
+ORDER BY hknk.NGAYBATDAUNIENKHOA DESC;
         `,
             [MAGV]
         );

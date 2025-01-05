@@ -300,8 +300,8 @@ const ComponenCreateGiangVien = () => {
   };
 
   const handleChoseEditGiangVien = async (giangvien) => {
-    // console.log("check");
-    // setMaGV(giangvien.MAGV);
+    // console.log("check: ", giangvien);
+    setMaGV(giangvien);
     let Trangthai;
 
     if (giangvien.TRANGTHAITAIKHOAN === "Đang hoạt động") {
@@ -361,7 +361,7 @@ const ComponenCreateGiangVien = () => {
     setMaBoMon(null);
   };
 
-  const handleSumitEditGV = async (event) => {};
+  const handleSumitEditGV = async (event) => { };
   // -----------------------IS OPEN EXCEL-----------------------------------
 
   const [searchStatus, setSearchStatus] = useState("All");
@@ -401,8 +401,8 @@ const ComponenCreateGiangVien = () => {
   const [dataListChucDanhGiangVien, setdataListChucDanhGiangVien] = useState();
 
   const handleShowUpdateModal = async (lecturer) => {
+    // console.log("lecturer: ", lecturer)
     setSelectedLecturer(lecturer);
-    setShowUpdateModal(true);
 
     try {
       const [chucVuResponse, chucDanhResponse] = await Promise.all([
@@ -413,9 +413,13 @@ const ComponenCreateGiangVien = () => {
           `${process.env.REACT_APP_URL_SERVER}/api/v1/admin/giangvien/xemchucdanh`
         ),
       ]);
+      console.log("chucVuResponse.data.DT: ", chucVuResponse.data.DT)
+      console.log("chucDanhResponse.data.DT: ", chucDanhResponse.data.DT)
 
-      setdataListChucVuGiangVien(chucVuResponse.data.DT);
-      setdataListChucDanhGiangVien(chucDanhResponse.data.DT);
+      setdataListChucVuGiangVien(chucVuResponse.data?.DT || []);
+      setdataListChucDanhGiangVien(chucDanhResponse.data?.DT || []);
+
+      setShowUpdateModal(true);
     } catch (error) {
       console.error("Error updating lecturer information:", error);
       toast.error("Lỗi lấy dữ liệu ở phía server");
@@ -488,13 +492,12 @@ const ComponenCreateGiangVien = () => {
               <Select
                 labelId="select-label-trang-thai"
                 id="trang-thai-select"
-                className={`height-selectGV ${
-                  searchStatus === "Đang hoạt động"
-                    ? "text-success"
-                    : searchStatus === "Ngưng hoạt động"
+                className={`height-selectGV ${searchStatus === "Đang hoạt động"
+                  ? "text-success"
+                  : searchStatus === "Ngưng hoạt động"
                     ? "text-danger"
                     : ""
-                }`}
+                  }`}
                 value={searchStatus}
                 label="Trạng thái"
                 onChange={handleStatusChange}

@@ -4,8 +4,11 @@ import DashboardLayout from "../layouts/dashboard";
 import AccountGV from "../sections/Account/AccountGV";
 import Skeleton from "@mui/material/Skeleton";
 
+// const IndexPhanCongCuaToi = lazy(() =>
+//   import("../sections/PhanCongCuaToi/IndexPhanCongCuaToi")
+// ); // cái xem phân công cũ
 const IndexPhanCongCuaToi = lazy(() =>
-  import("../sections/PhanCongCuaToi/IndexPhanCongCuaToi")
+  import("../sections/XemPhanCong/xemPhanCong")
 );
 const IndexPhanCongGiangVien = lazy(() =>
   import("../sections/PhanCongGiangVien/IndexPhanCongGiangVien")

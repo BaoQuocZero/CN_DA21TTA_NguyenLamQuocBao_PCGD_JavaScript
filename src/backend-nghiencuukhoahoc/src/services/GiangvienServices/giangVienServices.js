@@ -23,7 +23,7 @@ const getPhanCongGV_MAGV = async (MAGV) => {
     } catch (error) {
         console.log(error);
         return {
-            EM: "lỗi services timKhungGioChuan_TENCHUCDANH",
+            EM: "lỗi services getPhanCongGV_MAGV",
             EC: -1,
             DT: [],
         };
