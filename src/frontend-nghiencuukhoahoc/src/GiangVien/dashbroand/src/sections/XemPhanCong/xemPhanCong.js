@@ -12,7 +12,9 @@ const XemPhanCongGV = () => {
     const [error, setError] = useState(null);
     const [giangVien, setGiangVien] = useState(null);
     const [phanCong, setPhanCong] = useState({});
+    const [filteredPhanCong, setFilteredPhanCong] = useState([]);
 
+    const [searchQuery, setSearchQuery] = useState(""); // State cho thanh tìm kiếm
     const [selectedMonHoc, setSelectedMonHoc] = useState(null);
     const [openModal, setOpenModal] = useState(false);
 
@@ -33,6 +35,21 @@ const XemPhanCongGV = () => {
             fetchDataPhanCongGV(giangVien.MAGV);
         }
     }, [giangVien]);
+
+    useEffect(() => {
+        if (searchQuery.trim() === "") {
+            setFilteredPhanCong(phanCong);
+        } else {
+            const query = searchQuery.toLowerCase();
+            const filtered = phanCong.filter((item) =>
+                Object.values(item).some((value) => {
+                    // Kiểm tra nếu value không null hoặc undefined, sau đó chuyển thành chuỗi và so sánh
+                    return value && value.toString().toLowerCase().includes(query);
+                })
+            );
+            setFilteredPhanCong(filtered);
+        }
+    }, [searchQuery, phanCong]);
 
     const fetchDataGV = async (taikhoan) => {
         try {
@@ -99,16 +116,18 @@ const XemPhanCongGV = () => {
         return <div>Loading...</div>;
     }
 
-    // if (error) {
-    //     return <div>Error: {error.message}</div>;
-    // }
-
     return (
         <>
             <div className="container my-4">
                 <h1 className="mb-4">Thông tin phân công</h1>
-
-                {phanCong && phanCong.length > 0 ? (
+                <input
+                    type="text"
+                    className="form-control mb-4"
+                    placeholder="Tìm kiếm..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {filteredPhanCong && filteredPhanCong.length > 0 ? (
                     <table className="table table-bordered table-striped">
                         <thead>
                             <tr>
@@ -124,7 +143,7 @@ const XemPhanCongGV = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {phanCong.map((item, index) => (
+                            {filteredPhanCong.map((item, index) => (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{new Date(item.NGAYBATDAUNIENKHOA).toLocaleDateString()}</td>

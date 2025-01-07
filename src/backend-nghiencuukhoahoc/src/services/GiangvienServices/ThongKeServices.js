@@ -122,9 +122,9 @@ const getBieuDo_GioGiangChonKhung = async (MAGV, SelectNamHoc_HocKiNienKhoa) => 
                 TONG_GIO: hocKi?.TONG_GIO || 0
             };
         });
-        console.log("resultsKhungGio: ", resultsKhungGio);
-        console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
-        console.log("combinedResults: ", combinedResults);
+        // console.log("resultsKhungGio: ", resultsKhungGio);
+        // console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
+        // console.log("combinedResults: ", combinedResults);
 
         return {
             EM: "Lấy thông tin thành công",
