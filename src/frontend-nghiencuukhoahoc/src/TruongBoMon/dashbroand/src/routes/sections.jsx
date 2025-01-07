@@ -34,6 +34,7 @@ const IndexQuanLydanhsachGV = lazy(() =>
 );
 
 const ThongKe = lazy(() => import("../sections/Thongke/thongKe"));
+const ThongKeGV = lazy(() => import("../sections/Thongke/ThongKeGV/ThongKe"));
 
 const Dev = lazy(() => import("../sections/dev/dev"));
 
@@ -60,6 +61,25 @@ export default function Router() {
             }
           >
             <ThongKe />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/thong-ke-gv",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <ThongKeGV />
           </Suspense>
         </DashboardLayout>
       ),

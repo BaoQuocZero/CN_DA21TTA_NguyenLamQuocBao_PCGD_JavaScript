@@ -6,8 +6,11 @@ const {
   getBieuDoTron,
   getBieuDoTron_PhanCong,
   getGV_BoMon,
+  getNamHoc_HocKiNienKhoaController,
 } = require("../../controllers/TruongbomonController/ThongKeController");
 const TruongBoMonThongKe = (app) => {
+  router.get("/getNamHoc_HocKiNienKhoa", getNamHoc_HocKiNienKhoaController);
+
   router.post("/bieudotron", checkUserJWT, getBieuDoTron);
   router.post("/bieudotron_phancong", checkUserJWT, getBieuDoTron_PhanCong);
   router.post("/giangvien", checkUserJWT, getGV_BoMon);

@@ -112,19 +112,21 @@ const getBieuDo_GioGiangChonKhung = async (MAGV, SelectNamHoc_HocKiNienKhoa) => 
         );
 
         // Gộp dữ liệu
-        const combinedResults = resultsKhungGio.map(khungGio => {
-            const hocKi = resultsHocKiNienKhoa.find(hocKi => hocKi.MAGV === khungGio.MAGV);
-            return {
-                ...khungGio,
-                MAHKNK: hocKi?.MAHKNK || null,
-                TENHKNK: hocKi?.TENHKNK || null,
-                NGAYBATDAUNIENKHOA: hocKi?.NGAYBATDAUNIENKHOA || null,
-                TONG_GIO: hocKi?.TONG_GIO || 0
-            };
-        });
-        // console.log("resultsKhungGio: ", resultsKhungGio);
-        // console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
-        // console.log("combinedResults: ", combinedResults);
+        const combinedResults = [{
+            MAGV: (resultsKhungGio[0] && resultsKhungGio[0].MAGV) || MAGV, // MAGV từ phần tử đầu tiên của resultsKhungGio, nếu không có lấy giá trị mặc định MAGV
+            TENNAMHOC: SelectNamHoc_HocKiNienKhoa || 'Năm học chưa xác định', // SelectNamHoc_HocKiNienKhoa hoặc giá trị mặc định
+            GIOGIANGDAY_HANHCHINH: resultsKhungGio[0]?.GIOGIANGDAY_HANHCHINH || 0, // GIOGIANGDAY_HANHCHINH từ phần tử đầu tiên của resultsKhungGio
+            MAHKNK: (resultsHocKiNienKhoa[0] && resultsHocKiNienKhoa[0].MAHKNK) || 'Chưa xác định', // MAHKNK từ phần tử đầu tiên của resultsHocKiNienKhoa, nếu không có trả về 'Chưa xác định'
+            TENHKNK: (resultsHocKiNienKhoa[0] && resultsHocKiNienKhoa[0].TENHKNK) || 'Chưa xác định', // TENHKNK từ phần tử đầu tiên của resultsHocKiNienKhoa
+            NGAYBATDAUNIENKHOA: (resultsHocKiNienKhoa[0] && resultsHocKiNienKhoa[0].NGAYBATDAUNIENKHOA) || null, // NGAYBATDAUNIENKHOA từ phần tử đầu tiên của resultsHocKiNienKhoa
+            TONG_GIO: (resultsHocKiNienKhoa[0] && resultsHocKiNienKhoa[0].TONG_GIO) || 0 // TONG_GIO từ phần tử đầu tiên của resultsHocKiNienKhoa
+        }];
+
+        console.log("MAGV: ", MAGV);
+        console.log("SelectNamHoc_HocKiNienKhoa: ", SelectNamHoc_HocKiNienKhoa);
+        console.log("resultsKhungGio: ", resultsKhungGio);
+        console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
+        console.log("combinedResults: ", combinedResults);
 
         return {
             EM: "Lấy thông tin thành công",
