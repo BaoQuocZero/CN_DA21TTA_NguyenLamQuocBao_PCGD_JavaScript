@@ -112,22 +112,24 @@ const getBieuDo_GioGiangChonKhung = async (MAGV, SelectNamHoc_HocKiNienKhoa) => 
         );
 
         // Gộp dữ liệu
-        const mergedData = resultsKhungGio.map((khung) => {
-            const hocKi = resultsHocKiNienKhoa.find(
-                (hoc) =>
-                    hoc.MAGV === khung.MAGV &&
-                    hoc.TEN_NAM_HOC === khung.TENNAMHOC
-            );
+        const combinedResults = resultsKhungGio.map(khungGio => {
+            const hocKi = resultsHocKiNienKhoa.find(hocKi => hocKi.MAGV === khungGio.MAGV);
             return {
-                ...khung,
-                ...(hocKi || {}), // Nếu không có khớp, thêm một object rỗng
+                ...khungGio,
+                MAHKNK: hocKi?.MAHKNK || null,
+                TENHKNK: hocKi?.TENHKNK || null,
+                NGAYBATDAUNIENKHOA: hocKi?.NGAYBATDAUNIENKHOA || null,
+                TONG_GIO: hocKi?.TONG_GIO || 0
             };
         });
+        console.log("resultsKhungGio: ", resultsKhungGio);
+        console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
+        console.log("combinedResults: ", combinedResults);
 
         return {
             EM: "Lấy thông tin thành công",
             EC: 1,
-            DT: mergedData,
+            DT: combinedResults,
         };
     } catch (error) {
         console.log("error getBieuDo_GioGiangChonKhung >>>", error);
