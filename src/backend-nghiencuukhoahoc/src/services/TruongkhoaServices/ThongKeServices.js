@@ -1,6 +1,42 @@
 const pool = require("../../config/database");
 const axios = require("axios");
 
+const Lay_GV_DaiDien_Thuoc_BoMon = async (MABOMON) => {
+    try {
+        let [giangvien] = await pool.execute(
+            `
+            SELECT
+            bomon.*,
+            giangvien.* 
+            FROM bomon
+            JOIN giangvien ON giangvien.MABOMON = bomon.MABOMON
+            WHERE bomon.MABOMON = ?
+            `,
+            [MABOMON]
+        );
+        if (!giangvien || giangvien.length === 0) {
+            return {
+                EM: "Không có giảng viên nào thuộc bộ môn này",
+                EC: 0,
+                DT: [],
+            };
+        }
+
+        return {
+            EM: "Lấy dữ liệu thành công",
+            EC: 1,
+            DT: giangvien,
+        };
+    } catch (error) {
+        console.error("Lỗi Lay_BoMon_Thuoc_Khoa: ", error);
+        return {
+            EM: "Lỗi Lay_BoMon_Thuoc_Khoa",
+            EC: -1,
+            DT: [],
+        };
+    }
+};
+
 const Lay_BoMon_Thuoc_Khoa = async (MAGV) => {
     try {
         let [giangvien] = await pool.execute(
@@ -178,13 +214,14 @@ const Lay_BieuDo_GioDay_KhungChuan = async (MAGV) => {
 
 const Lay_BieuDo_Theo_BoMon_NamHoc = async (MABOMON, MAHKNK) => {
     try {
-        if (!MABOMON || !MAHKNK) {
+        if (!MABOMON || !MAHKNK || MABOMON.length === 0 || MAHKNK.length === 0) {
             return {
                 EM: "Dữ liệu không hợp lệ",
                 EC: 0,
                 DT: [],
             };
         }
+
         let [namhoc] = await pool.execute(
             `
             SELECT 
@@ -195,6 +232,14 @@ const Lay_BieuDo_Theo_BoMon_NamHoc = async (MABOMON, MAHKNK) => {
             `,
             [MAHKNK]
         );
+
+        if (!namhoc || namhoc.length === 0) {
+            return {
+                EM: "Không tìm thấy năm học",
+                EC: 0,
+                DT: [],
+            };
+        }
 
         let [khunggiochuan] = await pool.execute(
             `
@@ -263,10 +308,72 @@ const Lay_BieuDo_Theo_BoMon_NamHoc = async (MABOMON, MAHKNK) => {
     }
 };
 
+const Lay_GVKhoa = async (MAGV) => {
+    try {
+        let [khoa] = await pool.execute(
+            `
+        SELECT 
+        khoa.*,
+        bomon.*,
+        giangvien.*
+        FROM giangvien
+        JOIN bomon ON bomon.MABOMON = giangvien.MABOMON
+        JOIN khoa ON khoa.MAKHOA = bomon.MAKHOA
+        WHERE giangvien.MAGV = ?
+            `,
+            [MAGV]
+        );
+        if (!MAGV || khoa.length === 0) {
+            return {
+                EM: "Dữ liệu không hợp lệ",
+                EC: 0,
+                DT: [],
+            };
+        }
+
+        let [giangvien_Khoa] = await pool.execute(
+            `
+            SELECT 
+            khoa.*,
+            bomon.*,
+            giangvien.*,
+            taikhoan.*,
+            chucvu.*,
+            chucdanh.*
+            FROM khoa 
+            JOIN bomon ON bomon.MAKHOA = khoa.MAKHOA
+            JOIN giangvien ON giangvien.MABOMON = bomon.MABOMON
+            LEFT JOIN taikhoan ON taikhoan.MAGV = giangvien.MAGV
+            LEFT JOIN giu_chuc_vu ON giu_chuc_vu.MAGV = giangvien.MAGV
+            LEFT JOIN chucvu ON chucvu.MACHUCVU = giu_chuc_vu.MACHUCVU
+            LEFT JOIN co_chuc_danh ON co_chuc_danh.MAGV = giangvien.MAGV
+            LEFT JOIN chucdanh ON chucdanh.MACHUCDANH = co_chuc_danh.MACHUCDANH
+            WHERE khoa.MAKHOA = ?;
+            `,
+            [khoa[0].MAKHOA]
+        );
+
+        return {
+            EM: "Lấy dữ liệu thành công",
+            EC: 1,
+            DT: giangvien_Khoa,
+        };
+    } catch (error) {
+        console.error("Lỗi Lay_BieuDo_Theo_BoMon_NamHoc: ", error);
+        return {
+            EM: "Lỗi Lay_BieuDo_Theo_BoMon_NamHoc",
+            EC: -1,
+            DT: [],
+        };
+    }
+};
+
 module.exports = {
+    Lay_GV_DaiDien_Thuoc_BoMon,
     Lay_BieuDo_GioDay_KhungChuan,
 
     Lay_BoMon_Thuoc_Khoa,
     Lay_NamHoc_HocKyNienKhoa,
     Lay_BieuDo_Theo_BoMon_NamHoc,
+    Lay_GVKhoa,
 };

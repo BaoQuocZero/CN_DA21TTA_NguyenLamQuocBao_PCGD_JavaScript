@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -14,19 +15,26 @@ import {
 } from "react-chartjs-2";
 import "chart.js/auto"; // Đăng ký tự động
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { DataGrid } from "@mui/x-data-grid";
 
 import {
     fetchDataGV,
+    fetchLay_GVKhoa,
     fetch_Lay_BoMon_Thuoc_KhoaChuan,
     fetch_Lay_NamHoc_HocKyNienKhoaController,
 
     fetch_Lay_BieuDo_GioDay_KhungChuan,
     fetch_Lay_BieuDo_Theo_BoMon_NamHoc,
+
 } from "./Services/ThongKeServces";
 
 const ThongKe = () => {
     const auth = Cookies.get("accessToken");
     const [giangVien, setGiangVien] = useState(null);
+    const [ListGiangVienKhoa, setListGiangVienKhoa] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [searchText, setSearchText] = useState(""); // Lưu giá trị tìm kiếm
+
     const [boMon, setBoMon] = useState([]);
     const [NamHoc_HocKynienKhoa, setNamHoc_HocKynienKhoa] = useState([]);
     const [SelectBoMon, setSelectBoMon] = useState([]);
@@ -87,10 +95,30 @@ const ThongKe = () => {
     }, [auth]);
 
     useEffect(() => {
+        const getGiangVienKhoa = async () => {
+            try {
+                const lsgv = await fetchLay_GVKhoa(giangVien.MAGV);
+                const dataWithId = lsgv?.map((gv, index) => ({
+                    ...gv,
+                    id: index + 1,
+                }));
+                setListGiangVienKhoa(dataWithId);
+                setFilteredData(dataWithId);
+                // console.log("dataWithId: ", dataWithId)
+            } catch (error) {
+                console.error("Lỗi khi lấy giảng viên:", error);
+            }
+        };
+        getGiangVienKhoa();
+
         const getBoMon = async () => {
             try {
                 const bm = await fetch_Lay_BoMon_Thuoc_KhoaChuan(giangVien.MAGV);
-                setBoMon(bm);
+                const dataWithId = bm?.map((bm, index) => ({
+                    ...bm,
+                    id: index + 1,
+                }));
+                setBoMon(dataWithId);
             } catch (error) {
                 console.error("Lỗi khi lấy giảng viên:", error);
             }
@@ -170,6 +198,60 @@ const ThongKe = () => {
         setSelectNamHoc_HocKynienKhoa(event.target.value);
     };
 
+    const handleSearch = (event) => {
+        const value = event.target.value.toLowerCase();
+        setSearchText(value);
+
+        // Lọc dữ liệu dựa trên giá trị tìm kiếm
+        const filtered = ListGiangVienKhoa.filter((gv) => {
+            return (
+                gv.TENKHOA.toLowerCase().includes(value) ||
+                gv.TENBOMON.toLowerCase().includes(value) ||
+                gv.TENGV.toLowerCase().includes(value) ||
+                gv.EMAIL.toString().includes(value) ||
+                gv.DIENTHOAI.toString().includes(value)
+            );
+        });
+
+        setFilteredData(filtered); // Cập nhật dữ liệu sau khi lọc
+    };
+
+    const columnsBoMon = [
+        { field: "id", headerName: "ID", width: 100 },
+        { field: "TENKHOA", headerName: "Khoa", width: 200 },
+        { field: "TENBOMON", headerName: "Bộ môn", width: 250 },
+        {
+            field: "actions",
+            headerName: "Hành động",
+            width: 150,
+            renderCell: (params) => (
+                <Link to="/admin/thong-ke-bomon" state={{ bomon: params.row }}>
+                    Mở Thống Kê Giảng Viên
+                </Link>
+            ),
+        },
+    ];
+
+    const columns = [
+        { field: "id", headerName: "ID", width: 100 },
+        { field: "TENKHOA", headerName: "Khoa", width: 100 },
+        { field: "TENBOMON", headerName: "Bộ môn", width: 100 },
+        { field: "TENGV", headerName: "Tên", width: 200 },
+        { field: "EMAIL", headerName: "Email", width: 200 },
+        { field: "DIENTHOAI", headerName: "Điện thoại", width: 150 },
+        { field: "DIACHI", headerName: "Địa chỉ", width: 150 },
+        {
+            field: "actions",
+            headerName: "Hành động",
+            width: 150,
+            renderCell: (params) => (
+                <Link to="/admin/thong-ke-gv" state={{ giangVien: params.row }}>
+                    Mở Thống Kê Giảng Viên
+                </Link>
+            ),
+        },
+    ];
+
     return (
         <div className="row">
             <div className="col-md-8">
@@ -208,6 +290,28 @@ const ThongKe = () => {
                     </Select>
                 </FormControl>
                 <PolarArea data={polarData} />
+            </div>
+            <div className="col-12">
+                <h2>Danh sách bộ môn thuộc khoa</h2>
+                <div style={{ height: 300, width: "100%" }}>
+                    <DataGrid rows={boMon} columns={columnsBoMon} pageSize={5} />
+                </div>
+            </div>
+            <div className="col-12">
+                <h2>Danh sách giảng viên khoa</h2>
+                {/* Ô tìm kiếm */}
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        value={searchText}
+                        onChange={handleSearch}
+                        placeholder="Tìm kiếm sản phẩm..."
+                        className="form-control"
+                    />
+                </div>
+                <div style={{ height: 1000, width: "100%" }}>
+                    <DataGrid rows={filteredData} columns={columns} pageSize={5} />
+                </div>
             </div>
         </div>
     );

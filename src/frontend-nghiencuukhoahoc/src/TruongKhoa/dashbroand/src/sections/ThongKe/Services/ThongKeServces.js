@@ -13,6 +13,19 @@ export const fetchDataGV = async (taikhoan) => {
     }
 };
 
+export const fetchLay_GVKhoa = async (MAGV) => {
+    try {
+        const response = await CookiesAxios.post(
+            `${process.env.REACT_APP_URL_SERVER}/api/v1/truongkhoa/thongke/xem/Lay_GVKhoa`,
+            { MAGV }
+        );
+        return response.data.DT; // Trả về dữ liệu giảng viên
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu GIANG VIEN:", error);
+        throw error;
+    }
+};
+
 export const fetch_Lay_BoMon_Thuoc_KhoaChuan = async (MAGV) => {
     try {
         const response = await CookiesAxios.post(

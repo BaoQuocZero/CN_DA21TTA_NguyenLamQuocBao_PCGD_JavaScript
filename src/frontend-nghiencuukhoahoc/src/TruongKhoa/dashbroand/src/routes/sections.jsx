@@ -17,6 +17,8 @@ const IndexQuanLydanhsachGV = lazy(() =>
 );
 const Dev = lazy(() => import("../sections/dev/dev"));
 const ThongKe = lazy(() => import("../sections/ThongKe/ThongKe"));
+const ThongKeGV = lazy(() => import("../sections/ThongKe/ThongKeGV/ThongKe"));
+const ThongKeBoMon = lazy(() => import("../sections/ThongKe/ThongKeBoMon/thongKe"));
 
 const TrangChu = lazy(() => import("../pages/app"));
 const UserPage = lazy(() => import("../pages/user"));
@@ -51,7 +53,44 @@ export default function Router() {
         </DashboardLayout>
       ),
     },
-
+    {
+      path: "/thong-ke-bomon",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <ThongKeBoMon />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/thong-ke-gv",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <ThongKeGV />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
     {
       path: "/giang-vien", // Danh sách giảng viên trong khoa.
 
