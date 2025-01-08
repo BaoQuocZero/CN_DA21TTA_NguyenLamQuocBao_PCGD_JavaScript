@@ -122,11 +122,11 @@ const getBieuDo_GioGiangChonKhung = async (MAGV, SelectNamHoc_HocKiNienKhoa) => 
             TONG_GIO: (resultsHocKiNienKhoa[0] && resultsHocKiNienKhoa[0].TONG_GIO) || 0 // TONG_GIO từ phần tử đầu tiên của resultsHocKiNienKhoa
         }];
 
-        console.log("MAGV: ", MAGV);
-        console.log("SelectNamHoc_HocKiNienKhoa: ", SelectNamHoc_HocKiNienKhoa);
-        console.log("resultsKhungGio: ", resultsKhungGio);
-        console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
-        console.log("combinedResults: ", combinedResults);
+        // console.log("MAGV: ", MAGV);
+        // console.log("SelectNamHoc_HocKiNienKhoa: ", SelectNamHoc_HocKiNienKhoa);
+        // console.log("resultsKhungGio: ", resultsKhungGio);
+        // console.log("resultsHocKiNienKhoa: ", resultsHocKiNienKhoa);
+        // console.log("combinedResults: ", combinedResults);
 
         return {
             EM: "Lấy thông tin thành công",
