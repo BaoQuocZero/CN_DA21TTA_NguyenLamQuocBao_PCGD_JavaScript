@@ -1,9 +1,9 @@
 import { useState, useContext } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -67,7 +67,6 @@ export default function LoginView() {
 
             try {
               const decoded = jwtDecode(response.data.DT.access_token);
-              console.log(decoded.phanquyen);
               if (decoded.phanquyen == "Admin") {
                 navigate("/admin");
               }
@@ -132,8 +131,12 @@ export default function LoginView() {
         justifyContent="flex-end"
         sx={{ my: 3 }}
       >
-        <Link className="text-login" variant="subtitle2" underline="hover">
-          Forgot password?
+        <Link
+          to="/resetPassword"
+          className="text-login"
+          variant="subtitle2"
+          underline="hover">
+          Forgot password ?
         </Link>
       </Stack>
 

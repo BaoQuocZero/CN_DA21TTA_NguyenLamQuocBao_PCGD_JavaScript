@@ -5,6 +5,8 @@ const {
   updateThongTinGiangVienController,
   getPhanCongGV_MAGVControler,
   DoiMatKhauController,
+  QuenMatKhauController,
+  ResetPasswordController,
 } = require("../../controllers/GiangvienController/GiangVienController");
 const {
   select_thongtin_danhmuc,
@@ -72,6 +74,8 @@ const QuyenGiangVienRouter = (app) => {
 
   router.post("/xem/phancong", getPhanCongGV_MAGVControler);
   router.post("/doimatkhau", DoiMatKhauController);
+  router.post("/doimatkhau/reset", ResetPasswordController);
+  router.post("/QuenMatKhau", QuenMatKhauController);
 
 
   return app.use("/api/v1/quyengiangvien/giangvien", router);
