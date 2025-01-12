@@ -30,6 +30,11 @@ const navConfig = [
     path: "/dang-ky-khung-gio-chuan",
     icon: icon("ic_blog"),
   },
+  {
+    title: "Đổi mật khẩu",
+    path: "/doimatkhau",
+    icon: icon("ic_blog"),
+  },
   // {
   //   title: "Dev",
   //   path: "/dev",

@@ -37,7 +37,7 @@ const CreateCTDT = lazy(() =>
 const CreateKhoa = lazy(() =>
   import("../sections/KhoaTVU/CreateKhoa/CreateKhoa")
 );
-
+const DoiMatKhau = lazy(() => import("../sections/DoimatKhau/DoiMatKhau"));
 const DevPage = lazy(() => import("../sections/dev/dev"));
 
 const IndexPage = lazy(() => import("../pages/app"));
@@ -64,6 +64,25 @@ export default function Router() {
           >
             {/* <IndexPage /> */}
             <AdminCreate />
+          </Suspense>
+        </DashboardLayout>
+      ),
+    },
+    {
+      path: "/doimatkhau",
+      element: (
+        <DashboardLayout>
+          <Suspense
+            fallback={
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                sx={{ bgcolor: "grey.300" }}
+              />
+            }
+          >
+            <DoiMatKhau />
           </Suspense>
         </DashboardLayout>
       ),
